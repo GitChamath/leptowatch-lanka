@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+data/leptowatch.sqlite
+data/cache/
+data/*.tmp
+frontend/node_modules/
+frontend/dist/
