@@ -8,6 +8,8 @@ Population-level risk for planning prevention only. It does not diagnose, treat 
 
 ## Quick start
 
+Needs Python 3.12 (tested on 3.12.10). Node 20+ is only needed to change the UI.
+
 ```
 pip install -r requirements.txt
 python scripts/seed.py          # load the snapshot in data/seed into data/leptowatch.sqlite
@@ -61,21 +63,21 @@ The dashboard shows each district's own record in its card and replays any past 
 
 | Held-out 2018+ | 1-month lead | 2-month lead |
 |---|---|---|
-| Months worse than normal anyway | 55% | 56% |
-| **Warning** right when it fires | **73%** (417 of 571) | **68%** (380 of 563) |
-| Rain signal alone | 60% | 60% |
-| Case signal alone | 69% | 64% |
+| Months worse than normal anyway | 53% | 54% |
+| **Warning** right when it fires | **71%** (465 of 653) | **65%** (422 of 645) |
+| Rain signal alone | 58% | 58% |
+| Case signal alone | 67% | 62% |
 
 What this means:
 
-- The Warning (rain and cases together) is the useful signal: 1.33× the base rate one month ahead, 1.21× two months ahead.
+- The Warning (rain and cases together) is the useful signal: 1.34× the base rate one month ahead, 1.22× two months ahead.
 - Rain alone is only a few points better than chance, so it is shown as a Watch.
 - The rain signal was stronger in 2011–2017 (lift 1.28 at two months) than since 2018 (1.07).
-  The one-month Warning held up (69% → 73%); the two-month Warning weakened (71% → 68%). Both periods are reported.
+  The one-month Warning held up (69% → 71%); the two-month Warning weakened (71% → 65%). Both periods are reported.
 
-**Risk percentage.** One month ahead it passed its calibration check (Brier 0.220 vs 0.251 for the base rate,
+**Risk percentage.** One month ahead it passed its calibration check (Brier 0.219 vs 0.251 for the base rate,
 AUC 0.70). Two months ahead it failed, also after recalibration, so no percentage is shown there. Months without
-a case count were not well calibrated (predicted 64%, observed 52%), so the percentage is shown only when the
+a case count were not well calibrated (predicted 62%, observed 55%), so the percentage is shown only when the
 month's count is known.
 
 **Method comparison** (`scripts/compare_models.py`, trained on 2011–2017, tested on 2018+, each method given
@@ -83,17 +85,17 @@ as many alerts as the rule's Warnings):
 
 | 1-month lead | AUC | Right, same number of alerts |
 |---|---|---|
-| Seasonal calendar | 0.51 | 56% |
-| Rain alone | 0.58 | 59% |
-| The rule | 0.65 | 73% |
-| Last month's cases alone | 0.70 | 75% |
-| Logistic regression | 0.70 | 75% |
-| Gradient-boosted trees (comparison only) | 0.69 | 74% |
+| Seasonal calendar | 0.51 | 54% |
+| Rain alone | 0.58 | 58% |
+| The rule | 0.65 | 71% |
+| Last month's cases alone | 0.70 | 74% |
+| Logistic regression | 0.70 | 72% |
+| Gradient-boosted trees (comparison only) | 0.70 | 73% |
 
 Most of the one-month skill comes from case counts carrying on; rain adds little on top. Two months ahead every
-method is weaker (AUC 0.55–0.61). The same script tests the proposal's simpler normal (median of the same month
-over three years). It was steadier but fitted months worse and, on 2018+, called 61% of months above normal with
-a lower lift (1.30 vs 1.33), so the current normal is kept. Results are in `data/model_comparison.json` and
+method is weaker (AUC 0.56–0.62). The same script tests the proposal's simpler normal (median of the same month
+over three years). It was steadier but fitted months worse and, on 2018+, called 59% of months above normal, with
+the same lift one month ahead (1.34) and a lower one two months ahead (1.19 vs 1.22), so the current normal is kept. Results are in `data/model_comparison.json` and
 `data/baseline_comparison.json`.
 
 The earlier zone-level analysis (69% vs a 48% base rate) did not hold up at district level on newer data.
@@ -107,7 +109,8 @@ The earlier zone-level analysis (69% vs a 48% base rate) did not hold up at dist
 | CHIRPS v2 via ClimateSERV | daily rainfall averaged over each district | about 2–3 weeks after month end |
 | geoBoundaries ADM2 (CC BY 4.0) | district boundaries | static |
 
-- Case history 2007–2025 was rebuilt from archived WER PDFs.
+- Case history 2007 – early 2025 was rebuilt from archived WER PDFs; later reports (to Sep 2026) come from the live site.
+  The 2026 reports retitled Table 1 ("Distribution of Notified Diseases"); the reader accepts both titles.
   Year totals match Kumari & Dabrera (BMC Infect Dis, 2026) within about 3%.
 - Monthly counts are interpolated from weekly year-to-date totals. Months with gaps over 42 days between reports are left empty.
 - The WER asks for Epidemiology Unit approval before its data is published. That approval must be obtained

@@ -25,7 +25,7 @@ CANON = {"colom": "Colombo", "gampa": "Gampaha", "kalut": "Kalutara", "kandy": "
          "ratna": "Ratnapura", "rathn": "Ratnapura", "kegal": "Kegalle", "kalmu": "Kalmunai"}
 MONTHS = {m: i for i, m in enumerate(
     ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"], 1)}
-TABLE = re.compile(r"Selected\s+notifiable\s+diseases\s+reported")
+TABLE = re.compile(r"(?:Selected\s+notifiable|Distribution\s+of\s+Notified)\s+diseases\s+reported", re.I)  # 2026 retitle
 ROW = re.compile(r"^\s*([A-Za-z][A-Za-z .]*?)\s+((?:\d+\s+){11,}\d+)\s*$")
 DATE = re.compile(r"(\d{1,2})\s*(?:st|nd|rd|th)?\s*([A-Za-z]{3,9})\s*[-,]?\s*(\d{4})")
 WEEK = re.compile(r"(\d+)\s*(?:st|nd|rd|th)?\s*Week")
