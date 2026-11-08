@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { animate, motion, useReducedMotion } from "framer-motion";
 import { Icon } from "../icons.jsx";
+import { t } from "../i18n.js";
 import { LEVEL } from "../lib.js";
 
 /** Counts up (or down) to `value` whenever it changes. */
@@ -50,6 +51,11 @@ export function Status({ level, text, meaning }) {
       </div>
     </div>
   );
+}
+
+/** Translated text with <b>…</b> marks turned into bold, without injecting HTML. */
+export function Rich({ text }) {
+  return <>{text.split(/<b>(.*?)<\/b>/).map((p, i) => (i % 2 ? <b key={i}>{p}</b> : p))}</>;
 }
 
 export function Delta({ tone, children }) {
@@ -125,7 +131,7 @@ export function RainBars({ rows }) {
         })}
       </svg>
       <div className="chart-key">
-        <span><i className="sw-wet" />Wetter than usual</span><span><i className="sw-dry" />Not wetter</span><span><i className="sw-usual" />Usual</span>
+        <span><i className="sw-wet" />{t("lg_wetter")}</span><span><i className="sw-dry" />{t("lg_not_wetter")}</span><span><i className="sw-usual" />{t("lg_usual")}</span>
       </div>
     </>
   );
@@ -190,8 +196,8 @@ export function Chart({ rows }) {
         </div>
       )}
       <div className="chart-key">
-        <span><i />Reported cases</span><span><i className="d" />Usual for that month</span>
-        {gaps.length > 0 && <span><i className="sw-gap" />No public report</span>}
+        <span><i />{t("lg_reported")}</span><span><i className="d" />{t("lg_usual_month")}</span>
+        {gaps.length > 0 && <span><i className="sw-gap" />{t("lg_no_report")}</span>}
       </div>
     </div>
   );

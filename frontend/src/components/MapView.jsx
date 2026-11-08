@@ -1,12 +1,14 @@
 import { useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LEVEL, centroidOf, levelColor, pathOf } from "../lib.js";
+import { t } from "../i18n.js";
 
 /**
  * Choropleth of the 25 districts. Districts drop in on first load, colours cross-fade when
  * the alert level changes, Warning districts pulse, and the selected one lifts forward.
  */
-export default function MapView({ geo, levelOf, selected, onSelect }) {
+export default function MapView({ geo, levelOf, selected, onSelect, softOf = () => false }) {
+  const fillOf = (n) => (softOf(n) ? "watch_rain" : levelOf(n));
   const shapes = useMemo(() => geo.features.map((f) => ({
     name: f.properties.name, d: pathOf(f.geometry), c: centroidOf(f.geometry),
   })), [geo]);
@@ -55,7 +57,7 @@ export default function MapView({ geo, levelOf, selected, onSelect }) {
                 role="button"
                 aria-label={`${s.name}: ${LEVEL[lv]}`}
                 initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: selected && selected !== s.name ? 0.55 : 1, y: 0, fill: levelColor(lv) }}
+                animate={{ opacity: selected && selected !== s.name ? 0.55 : 1, y: 0, fill: levelColor(fillOf(s.name)) }}
                 transition={{
                   opacity: { duration: 0.35, delay: i * 0.025 }, y: { duration: 0.5, delay: i * 0.025, ease: [0.22, 1, 0.36, 1] },
                   fill: { duration: 0.6 },
@@ -84,7 +86,7 @@ export default function MapView({ geo, levelOf, selected, onSelect }) {
             <motion.path key={`sel-${sel.name}`} d={sel.d} className="selected" filter="url(#pop)"
               style={{ transformOrigin: `${sel.c[0]}px ${sel.c[1]}px`, transformBox: "view-box" }}
               initial={{ scale: 1, opacity: 0 }}
-              animate={{ scale: 1.06, opacity: 1, fill: levelColor(levelOf(sel.name)) }}
+              animate={{ scale: 1.06, opacity: 1, fill: levelColor(fillOf(sel.name)) }}
               exit={{ scale: 1, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 22 }}
               onClick={() => onSelect(sel.name)} />
@@ -107,8 +109,8 @@ export default function MapView({ geo, levelOf, selected, onSelect }) {
           <motion.div className="tip" style={{ left: hover.x, top: hover.y }}
             initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.12 }}>
-            <i className="key" style={{ background: levelColor(levelOf(hover.name)) }} />
-            {hover.name} — {LEVEL[levelOf(hover.name)]}
+            <i className="key" style={{ background: levelColor(fillOf(hover.name)) }} />
+            {hover.name} — {LEVEL[levelOf(hover.name)]}{softOf(hover.name) ? ` · ${t("rain_only")}` : ""}
           </motion.div>
         )}
       </AnimatePresence>

@@ -1,23 +1,39 @@
-export const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-export const fmt = (m) => (m ? `${MONTHS[+m.slice(5) - 1]} ${m.slice(0, 4)}` : "—");
-export const mon = (m) => (m ? MONTHS[+m.slice(5) - 1] : "—");
+import { MONTH_NAMES, byLang, getLang, t } from "./i18n.js";
 
-export const LEVEL = { warning: "Warning", watch: "Watch", normal: "Normal", nodata: "No data" };
-export const LEVEL_MEANING = {
-  warning: "Priority follow-up needed",
-  watch: "Monitor conditions closely",
-  normal: "No signal above the threshold",
-  nodata: "Not enough data to assess",
-};
+export const MONTHS = MONTH_NAMES.en;
+const monthName = (m) => (MONTH_NAMES[getLang()] || MONTH_NAMES.en)[+m.slice(5) - 1];
+export const fmt = (m) => (m ? `${monthName(m)} ${m.slice(0, 4)}` : "—");
+export const mon = (m) => (m ? monthName(m) : "—");
+/** "9 Nov" from an ISO date. */
+export const fmtDay = (d) => (d ? `${+d.slice(8, 10)} ${monthName(d.slice(0, 7))}` : "—");
+
+/** Where a forecast month sits relative to today: "this month", "next month", "last month", ... */
+export function whenLabel(m) {
+  const now = new Date();
+  const d = (+m.slice(0, 4) - now.getFullYear()) * 12 + (+m.slice(5) - 1 - now.getMonth());
+  if (d === 0) return t("when_this");
+  if (d === 1) return t("when_next");
+  if (d === -1) return t("when_last");
+  return d > 1 ? t("when_in", { n: d }) : t("when_ago", { n: -d });
+}
+
+export const LEVEL = byLang({
+  en: { warning: "Warning", watch: "Watch", normal: "Normal", nodata: "No data" },
+  si: { warning: "අනතුරු ඇඟවීම", watch: "සුපරීක්ෂාව", normal: "සාමාන්‍ය", nodata: "දත්ත නැත" },
+  ta: { warning: "எச்சரிக்கை", watch: "கண்காணிப்பு", normal: "இயல்பு", nodata: "தரவு இல்லை" },
+});
+export const LEVEL_MEANING = byLang({
+  en: { warning: "Priority follow-up needed", watch: "Monitor conditions closely", normal: "No signal above the threshold", nodata: "Not enough data to assess" },
+  si: { warning: "ප්‍රමුඛ පසු විපරම් අවශ්‍යයි", watch: "තත්ත්වය සමීපව නිරීක්ෂණය කරන්න", normal: "සීමාවට වඩා සංඥාවක් නැත", nodata: "තක්සේරු කිරීමට ප්‍රමාණවත් දත්ත නැත" },
+  ta: { warning: "முன்னுரிமைப் பின்தொடர்தல் தேவை", watch: "நிலைமையை உன்னிப்பாகக் கண்காணியுங்கள்", normal: "வரம்புக்கு மேல் சமிக்ஞை இல்லை", nodata: "மதிப்பிடப் போதுமான தரவு இல்லை" },
+});
 export const LEVELS = ["warning", "watch", "normal"];
-export const COLOR_VAR = { warning: "--warning", watch: "--watch", normal: "--normal", nodata: "--nodata" };
+export const COLOR_VAR = { warning: "--warning", watch: "--watch", watch_rain: "--watch-rain", normal: "--normal", nodata: "--nodata" };
 
-export const WHY = {
-  warning: "Rain and cases are both above normal for this district. Prioritise local review and preventive outreach.",
-  watch: "One signal is up. This alone is a weak predictor, so treat it as a prompt to check the latest case count.",
-  normal: "Neither rain nor cases are above normal for this time of year.",
-  nodata: "Not enough data to assess this district.",
-};
+/** A Watch that rests on rain alone: rain is up and no rise in cases is known. Shown paler on the map. */
+export const rainOnly = (c) => !!c && c.level === "watch" && !!c.rain_signal && c.case_signal !== true;
+
+export const WHY = new Proxy({}, { get: (_, k) => t(`why_${String(k)}`) });
 
 /** Plain explanation of why the current outlook has its level, given which signals are known. */
 export function whyText(c) {
@@ -25,28 +41,67 @@ export function whyText(c) {
   const caseKnown = c.case_signal != null;
   if (c.level === "warning") return WHY.warning;
   if (c.level === "watch") {
-    if (c.rain_signal && !caseKnown) return "Rain signal only: it has been wetter than usual. Rain alone is a weak predictor, so check this month's case count to confirm or clear it.";
-    if (c.rain_signal) return "Wetter than usual, but cases are not above normal. Keep an eye on it.";
-    return "Cases are above normal, but rain is not. Keep an eye on it.";
+    if (c.rain_signal && !caseKnown) return t("why_rain_only");
+    if (c.rain_signal && c.case_signal) return t("why_rain_cases_low");   // weekly: cases up but below 1.4 x normal
+    if (c.rain_signal) return t("why_rain_not_cases");
+    return t("why_cases_not_rain");
   }
-  return caseKnown ? WHY.normal : "Rain is not above usual. This month's case count is not available yet.";
+  return caseKnown ? WHY.normal : t("why_normal_nocase");
 }
 
-export const ACTIONS = {
-  warning: [
-    "Review the situation with the Regional Epidemiologist and the district leptospirosis steering committee",
-    "Start preventive outreach in farming villages, following the paddy-season guideline",
-    "Ask hospitals to be ready for a possible rise in cases",
-    "Ask health authorities whether preventive measures for high-exposure farmers are needed",
-  ],
-  watch: [
-    "Check this month's case count from hospital and PHI reports, and enter it here",
-    "Brief Public Health Inspectors on the higher rainfall",
-    "Remind farming communities of routine precautions",
-  ],
-  normal: ["Continue routine seasonal prevention"],
-  nodata: [],
-};
+/** For a rain-only Watch: the smallest case count that would turn it into a Warning (cases must exceed the usual). */
+export function casesForWarning(c) {
+  if (!c || c.level !== "watch" || !c.rain_signal || c.case_signal === true || c.cases_normal == null) return null;
+  return Math.floor(c.cases_normal) + 1;
+}
+
+export const ACTIONS = byLang({
+  en: {
+    warning: [
+      "Review the situation with the Regional Epidemiologist and the district leptospirosis steering committee",
+      "Start preventive outreach in farming villages, following the paddy-season guideline",
+      "Ask hospitals to be ready for a possible rise in cases",
+      "Ask health authorities whether preventive measures for high-exposure farmers are needed",
+    ],
+    watch: [
+      "Check the latest case count from hospital and PHI reports, and enter it here",
+      "Brief Public Health Inspectors on the higher rainfall",
+      "Remind farming communities of routine precautions",
+    ],
+    normal: ["Continue routine seasonal prevention"],
+    nodata: [],
+  },
+  si: {
+    warning: [
+      "ප්‍රාදේශීය වසංගත රෝග විද්‍යාඥයා සහ දිස්ත්‍රික් මී උණ මෙහෙයුම් කමිටුව සමඟ තත්ත්වය සමාලෝචනය කරන්න",
+      "කුඹුරු කන්න මාර්ගෝපදේශය අනුව ගොවි ගම්මානවල වැළැක්වීමේ දැනුවත් කිරීම් අරඹන්න",
+      "රෝගීන් වැඩිවිය හැකි බැවින් සූදානම්ව සිටින ලෙස රෝහල්වලට දන්වන්න",
+      "වැඩි අවදානමක් ඇති ගොවීන් සඳහා වැළැක්වීමේ පියවර අවශ්‍යදැයි සෞඛ්‍ය බලධාරීන්ගෙන් විමසන්න",
+    ],
+    watch: [
+      "රෝහල් සහ මහජන සෞඛ්‍ය පරීක්ෂක වාර්තාවලින් නවතම රෝගී සංඛ්‍යාව පරීක්ෂා කර මෙහි ඇතුළත් කරන්න",
+      "වැඩි වර්ෂාපතනය ගැන මහජන සෞඛ්‍ය පරීක්ෂකවරුන් දැනුවත් කරන්න",
+      "සුපුරුදු ආරක්ෂිත පියවර ගැන ගොවි ප්‍රජාවට මතක් කරන්න",
+    ],
+    normal: ["සුපුරුදු කන්න වැළැක්වීමේ කටයුතු දිගටම කරන්න"],
+    nodata: [],
+  },
+  ta: {
+    warning: [
+      "பிராந்திய தொற்றுநோயியல் நிபுணர் மற்றும் மாவட்ட எலிக்காய்ச்சல் வழிநடத்தல் குழுவுடன் நிலைமையை மீளாய்வு செய்யுங்கள்",
+      "நெல் பருவ வழிகாட்டலின்படி விவசாயக் கிராமங்களில் தடுப்பு விழிப்புணர்வைத் தொடங்குங்கள்",
+      "நோயாளர்கள் அதிகரிக்கக்கூடும் என்பதால் தயாராக இருக்குமாறு மருத்துவமனைகளிடம் கேளுங்கள்",
+      "அதிக ஆபத்துள்ள விவசாயிகளுக்குத் தடுப்பு நடவடிக்கைகள் தேவையா என்று சுகாதார அதிகாரிகளிடம் கேளுங்கள்",
+    ],
+    watch: [
+      "மருத்துவமனை மற்றும் PHI அறிக்கைகளிலிருந்து சமீபத்திய நோயாளர் எண்ணிக்கையைச் சரிபார்த்து இங்கே உள்ளிடுங்கள்",
+      "அதிக மழைவீழ்ச்சி பற்றி பொதுச் சுகாதாரப் பரிசோதகர்களுக்குத் தெரிவியுங்கள்",
+      "வழக்கமான முன்னெச்சரிக்கைகளை விவசாயச் சமூகங்களுக்கு நினைவூட்டுங்கள்",
+    ],
+    normal: ["வழக்கமான பருவகாலத் தடுப்பைத் தொடருங்கள்"],
+    nodata: [],
+  },
+});
 
 export const PROVINCE = {
   Colombo: "Western", Gampaha: "Western", Kalutara: "Western", Kandy: "Central", Matale: "Central",

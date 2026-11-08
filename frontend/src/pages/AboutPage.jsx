@@ -1,335 +1,276 @@
 import { Icon } from "../icons.jsx";
-import { LEVEL, LEVELS, fmt, levelColor } from "../lib.js";
+import { dname, useLang } from "../i18n.js";
+import { LEVEL, fmt, fmtDay, levelColor } from "../lib.js";
 
-const pct = (x) => (x == null ? "—" : `${Math.round(x * 100)}%`);
-
-const STEPS = [
-  ["rain", "Monitor rainfall", "We monitor rainfall across each district using satellite-based rainfall data."],
-  ["chart", "Compare with case reports", "We compare rainfall and reported leptospirosis cases with each district's usual pattern for that time of year."],
-  ["bell", "Identify potential warnings", "The system flags months where the pattern suggests higher-than-usual disease activity."],
-];
-
-const LEVEL_TEXT = {
-  warning: "Rain and cases both above usual",
-  watch: "One of the two above usual, usually rain",
-  normal: "Neither above usual",
-  nodata: "Not enough data to say",
+/**
+ * How it works, as the arithmetic an officer could do by hand: count, compare with the usual, combine.
+ * Methods, full test results and model comparisons live in the technical README (served at /readme).
+ */
+const TEXT = {
+  en: {
+    title: "How it works",
+    lead: "Every Saturday, LeptoWatch compares the last few weeks in your district with the same weeks in past years. It uses two numbers: rainy days in the last 8 weeks and cases in the last 4 weeks.",
+    rainStep: {
+      title: "Rain",
+      points: [
+        "A rainy day is a day with at least 1 mm of rain, averaged over the district.",
+        "Count the rainy days in the last 8 weeks (56 days).",
+        "Count them for the same 8 weeks in each past year, and take the middle value (the median). That is the usual number.",
+        "If this year's count is higher than the usual number, rain is up.",
+      ],
+      example: "{d}, 8 weeks to {date}",
+      lines: ["Rainy days: {rd}", "Usual (middle of past years): {rn}"],
+      up: "{rd} is more than {rn} → rain is up",
+      notUp: "{rd} is not more than {rn} → rain is not up",
+    },
+    caseStep: {
+      title: "Cases",
+      points: [
+        "Take the cases notified in the last 12 months and divide by 13. That gives an average 4 weeks for your district.",
+        "Some times of year are always busier. The season factor says how much: 1.3 means this time of year usually has 1.3 times an average 4 weeks. It is the middle value from past years.",
+        "Usual cases = average 4 weeks × season factor.",
+        "If the cases notified in the last 4 weeks are more than the usual number, cases are up.",
+        "For a Warning, cases must be more than 1.4 times the usual number (40% above usual).",
+      ],
+      example: "Example with round numbers",
+      lines: ["Last 12 months: 650 cases → 650 ÷ 13 = 50", "Season factor 1.3 → usual = 50 × 1.3 = 65",
+        "Warning bar = 65 × 1.4 = 91", "Cases in the last 4 weeks: 95"],
+      up: "95 is more than 91 → cases are well above usual",
+    },
+    alertStep: "The alert",
+    level: {
+      normal: "Neither is up. Continue routine prevention.",
+      watch: "Rain or cases is up, but not enough for a Warning. Check your latest case count.",
+      warning: "Rain is up and cases are more than 1.4 times usual. Start preventive outreach and alert hospitals.",
+    },
+    leads: ["Next 4 weeks and weeks 5–8", "Both use the same numbers from the last few weeks. Weeks 5–8 looks further ahead, so it gives more time to prepare but is less certain."],
+    reliable: "How often is it right?",
+    rows: [
+      ["{w} of 100", "Warnings for the next 4 weeks were followed by more cases than usual."],
+      ["{w2} of 100", "Warnings for weeks 5–8 were followed by more cases than usual."],
+      ["{b} of 100", "4-week periods have more cases than usual anyway, with no forecast at all."],
+    ],
+    tested: "We set the rules using 2011 to 2017 only, then tested them on {from} to {to}, treating each Saturday as if it were today.",
+    mind: "Keep in mind",
+    minds: [
+      "Public case reports come 8 to 11 weeks late. Add the cases notified in the last 4 weeks, so a Warning is possible.",
+      "Rain alone is a weak sign, so rain alone only gives a Watch, never a Warning.",
+      "Leptospirosis is under-reported. Comparing your district with its own past reduces this problem.",
+      "It helps you plan prevention. It does not diagnose patients or give treatment advice.",
+    ],
+    data: "Where the data comes from",
+    sources: [
+      ["Cases", "Epidemiology Unit, Weekly Epidemiological Reports (to {cases})"],
+      ["Rain", "Open-Meteo daily rainfall (to {om}); CHIRPS satellite rainfall for Past seasons (to {rain})"],
+      ["Map", "geoBoundaries district boundaries"],
+    ],
+  },
+  si: {
+    title: "ක්‍රියා කරන ආකාරය",
+    lead: "සෑම සෙනසුරාදාවකම LeptoWatch ඔබේ දිස්ත්‍රික්කයේ පසුගිය සති කිහිපය, පසුගිය වසරවල එම සති සමඟ සසඳයි. එය අංක දෙකක් භාවිතා කරයි: පසුගිය සති 8 තුළ වැසි දින සහ පසුගිය සති 4 තුළ රෝගීන්.",
+    rainStep: {
+      title: "වැසි",
+      points: [
+        "වැසි දිනයක් යනු දිස්ත්‍රික්කය පුරා සාමාන්‍යයෙන් අවම වශයෙන් මි.මී. 1 ක වැසි ලැබුණු දිනයකි.",
+        "පසුගිය සති 8 (දින 56) තුළ වැසි දින ගණන් කරන්න.",
+        "පසුගිය සෑම වසරකම එම සති 8 සඳහාද ගණන් කර, මැද අගය (මධ්‍යස්ථය) ගන්න. එය සුපුරුදු අගයයි.",
+        "මෙම වසරේ ගණන සුපුරුදු අගයට වඩා වැඩි නම්, වැසි ඉහළයි.",
+      ],
+      example: "{d}, {date} දක්වා සති 8",
+      lines: ["වැසි දින: {rd}", "සුපුරුදු (පසුගිය වසරවල මැද අගය): {rn}"],
+      up: "{rd} > {rn} → වැසි ඉහළයි",
+      notUp: "{rd} යනු {rn} ට වඩා වැඩි නොවේ → වැසි ඉහළ නැත",
+    },
+    caseStep: {
+      title: "රෝගීන්",
+      points: [
+        "පසුගිය මාස 12 තුළ දැනුම් දුන් රෝගීන් ගණන 13 න් බෙදන්න. එය ඔබේ දිස්ත්‍රික්කයේ සාමාන්‍ය සති 4 කි.",
+        "වසරේ සමහර කාලවලදී සැමවිටම රෝගීන් වැඩිය. කන්න සාධකය එය පෙන්වයි: 1.3 යනු මෙම කාලයේ සාමාන්‍ය සති 4 කට වඩා 1.3 ගුණයක් රෝගීන් සාමාන්‍යයෙන් සිටින බවයි. එය පසුගිය වසරවල මැද අගයයි.",
+        "සුපුරුදු රෝගීන් = සාමාන්‍ය සති 4 × කන්න සාධකය.",
+        "පසුගිය සති 4 තුළ දැනුම් දුන් රෝගීන් සුපුරුදු අගයට වඩා වැඩි නම්, රෝගීන් ඉහළයි.",
+        "අනතුරු ඇඟවීමක් සඳහා රෝගීන් සුපුරුදු අගය මෙන් 1.4 ගුණයකට වඩා (40% කට වඩා) වැඩි විය යුතුය.",
+      ],
+      example: "රවුම් අංක සහිත උදාහරණයක්",
+      lines: ["පසුගිය මාස 12: රෝගීන් 650 → 650 ÷ 13 = 50", "කන්න සාධකය 1.3 → සුපුරුදු = 50 × 1.3 = 65",
+        "අනතුරු ඇඟවීමේ සීමාව = 65 × 1.4 = 91", "පසුගිය සති 4 තුළ රෝගීන්: 95"],
+      up: "95 > 91 → රෝගීන් සුපුරුදු ප්‍රමාණයට වඩා බොහෝ වැඩියි",
+    },
+    alertStep: "අනතුරු ඇඟවීම",
+    level: {
+      normal: "කිසිවක් ඉහළ නැත. සුපුරුදු වැළැක්වීමේ කටයුතු කරගෙන යන්න.",
+      watch: "වැසි හෝ රෝගීන් ඉහළයි, නමුත් අනතුරු ඇඟවීමකට ප්‍රමාණවත් නැත. ඔබේ නවතම රෝගී සංඛ්‍යාව පරීක්ෂා කරන්න.",
+      warning: "වැසි ඉහළයි, රෝගීන් සුපුරුදු ප්‍රමාණය මෙන් 1.4 ගුණයකට වඩා වැඩියි. වැළැක්වීමේ දැනුවත් කිරීම් අරඹා රෝහල් දැනුවත් කරන්න.",
+    },
+    leads: ["ඉදිරි සති 4 සහ සති 5–8", "දෙකම පසුගිය සති කිහිපයේ එකම අංක භාවිතා කරයි. සති 5–8 තවත් ඉදිරියට බලයි, එබැවින් සූදානම් වීමට වැඩි කාලයක් ලැබෙන නමුත් නිශ්චිතභාවය අඩුය."],
+    reliable: "එය කොපමණ වාරයක් නිවැරදිද?",
+    rows: [
+      ["100 න් {w}", "ඉදිරි සති 4 සඳහා වූ අනතුරු ඇඟවීම්වලින් පසු සුපුරුදු ප්‍රමාණයට වඩා රෝගීන් සිටියහ."],
+      ["100 න් {w2}", "සති 5–8 සඳහා වූ අනතුරු ඇඟවීම්වලින් පසු සුපුරුදු ප්‍රමාණයට වඩා රෝගීන් සිටියහ."],
+      ["100 න් {b}", "පුරෝකථනයක් නැතිව වුවද සති 4 කාලපරිච්ඡේදවල සුපුරුදු ප්‍රමාණයට වඩා රෝගීන් සිටියි."],
+    ],
+    tested: "අපි නීති සකස් කළේ 2011 සිට 2017 දක්වා දත්ත පමණක් භාවිතයෙන්. පසුව සෑම සෙනසුරාදාවක්ම අද දිනය ලෙස සලකා ඒවා {from} සිට {to} දක්වා පරීක්ෂා කළෙමු.",
+    mind: "මතක තබා ගන්න",
+    minds: [
+      "ප්‍රසිද්ධ රෝගී වාර්තා සති 8 සිට 11 දක්වා ප්‍රමාද වේ. අනතුරු ඇඟවීමක් ලැබිය හැකි වන පරිදි පසුගිය සති 4 තුළ දැනුම් දුන් රෝගීන් ඇතුළත් කරන්න.",
+      "වැසි පමණක් දුර්වල ලකුණකි, එබැවින් වැසි පමණක් සුපරීක්ෂාවක් පමණක් දෙයි, කිසිදා අනතුරු ඇඟවීමක් නොදෙයි.",
+      "මී උණ අඩුවෙන් වාර්තා වේ. ඔබේ දිස්ත්‍රික්කය එහිම අතීතය සමඟ සැසඳීමෙන් මෙම ගැටලුව අඩු වේ.",
+      "එය වැළැක්වීම සැලසුම් කිරීමට උපකාරී වේ. එය රෝගීන් හඳුනා ගැනීම හෝ ප්‍රතිකාර උපදෙස් ලබා දීම නොකරයි.",
+    ],
+    data: "දත්ත ලැබෙන්නේ කොහෙන්ද",
+    sources: [
+      ["රෝගීන්", "වසංගත රෝග විද්‍යා ඒකකය, සතිපතා වසංගත රෝග විද්‍යා වාර්තා ({cases} දක්වා)"],
+      ["වැසි", "Open-Meteo දෛනික වර්ෂාපතනය ({om} දක්වා); පසුගිය කන්න සඳහා CHIRPS චන්ද්‍රිකා වර්ෂාපතනය ({rain} දක්වා)"],
+      ["සිතියම", "geoBoundaries දිස්ත්‍රික් මායිම්"],
+    ],
+  },
+  ta: {
+    title: "இது எப்படி வேலை செய்கிறது",
+    lead: "ஒவ்வொரு சனிக்கிழமையும் LeptoWatch உங்கள் மாவட்டத்தின் கடந்த சில வாரங்களைக் கடந்த ஆண்டுகளின் அதே வாரங்களுடன் ஒப்பிடுகிறது. அது இரண்டு எண்களைப் பயன்படுத்துகிறது: கடந்த 8 வாரங்களின் மழை நாட்களும் கடந்த 4 வாரங்களின் நோயாளர்களும்.",
+    rainStep: {
+      title: "மழை",
+      points: [
+        "மழை நாள் என்பது மாவட்டம் முழுவதும் சராசரியாகக் குறைந்தது 1 மி.மீ மழை பெய்த நாள்.",
+        "கடந்த 8 வாரங்களில் (56 நாட்கள்) மழை நாட்களை எண்ணுங்கள்.",
+        "கடந்த ஒவ்வொரு ஆண்டின் அதே 8 வாரங்களுக்கும் எண்ணி, நடு மதிப்பை (இடைநிலை) எடுங்கள். அதுவே வழக்கமான எண்.",
+        "இந்த ஆண்டின் எண்ணிக்கை வழக்கமான எண்ணை விட அதிகமெனில், மழை உயர்ந்துள்ளது.",
+      ],
+      example: "{d}, {date} வரையான 8 வாரங்கள்",
+      lines: ["மழை நாட்கள்: {rd}", "வழக்கம் (கடந்த ஆண்டுகளின் நடு மதிப்பு): {rn}"],
+      up: "{rd} > {rn} → மழை உயர்ந்துள்ளது",
+      notUp: "{rd} என்பது {rn} ஐ விட அதிகமில்லை → மழை உயரவில்லை",
+    },
+    caseStep: {
+      title: "நோயாளர்கள்",
+      points: [
+        "கடந்த 12 மாதங்களில் அறிவிக்கப்பட்ட நோயாளர்களை 13 ஆல் வகுங்கள். அதுவே உங்கள் மாவட்டத்தின் சராசரி 4 வாரங்கள்.",
+        "ஆண்டின் சில காலங்களில் எப்போதும் அதிக நோயாளர்கள் இருப்பர். பருவக் காரணி அதைக் காட்டுகிறது: 1.3 என்றால் இந்தக் காலத்தில் சராசரி 4 வாரங்களை விட 1.3 மடங்கு நோயாளர்கள் வழக்கமாக இருப்பர். இது கடந்த ஆண்டுகளின் நடு மதிப்பு.",
+        "வழக்கமான நோயாளர்கள் = சராசரி 4 வாரங்கள் × பருவக் காரணி.",
+        "கடந்த 4 வாரங்களில் அறிவிக்கப்பட்ட நோயாளர்கள் வழக்கமான எண்ணை விட அதிகமெனில், நோயாளர்கள் உயர்ந்துள்ளனர்.",
+        "எச்சரிக்கைக்கு, நோயாளர்கள் வழக்கமான எண்ணின் 1.4 மடங்குக்கு (40% க்கு) மேல் இருக்க வேண்டும்.",
+      ],
+      example: "முழு எண்களுடன் ஓர் உதாரணம்",
+      lines: ["கடந்த 12 மாதங்கள்: 650 நோயாளர்கள் → 650 ÷ 13 = 50", "பருவக் காரணி 1.3 → வழக்கம் = 50 × 1.3 = 65",
+        "எச்சரிக்கை எல்லை = 65 × 1.4 = 91", "கடந்த 4 வாரங்களில் நோயாளர்கள்: 95"],
+      up: "95 > 91 → நோயாளர்கள் வழக்கத்தை விட மிக அதிகம்",
+    },
+    alertStep: "எச்சரிக்கை",
+    level: {
+      normal: "எதுவும் உயரவில்லை. வழக்கமான தடுப்பைத் தொடருங்கள்.",
+      watch: "மழை அல்லது நோயாளர்கள் உயர்ந்துள்ளனர், ஆனால் எச்சரிக்கைக்குப் போதாது. உங்கள் சமீபத்திய நோயாளர் எண்ணிக்கையைச் சரிபாருங்கள்.",
+      warning: "மழை உயர்ந்துள்ளது, நோயாளர்கள் வழக்கத்தின் 1.4 மடங்குக்கு மேல். தடுப்பு விழிப்புணர்வைத் தொடங்கி மருத்துவமனைகளுக்குத் தெரிவியுங்கள்.",
+    },
+    leads: ["அடுத்த 4 வாரங்களும் வாரங்கள் 5–8 உம்", "இரண்டும் கடந்த சில வாரங்களின் அதே எண்களைப் பயன்படுத்துகின்றன. வாரங்கள் 5–8 மேலும் முன்னோக்கிப் பார்க்கிறது, எனவே தயாராக அதிக நேரம் தருகிறது, ஆனால் உறுதி குறைவு."],
+    reliable: "இது எத்தனை முறை சரியாக இருக்கிறது?",
+    rows: [
+      ["100 இல் {w}", "அடுத்த 4 வாரங்களுக்கான எச்சரிக்கைகளுக்குப் பின் வழக்கத்தை விட அதிக நோயாளர்கள் இருந்தனர்."],
+      ["100 இல் {w2}", "வாரங்கள் 5–8 க்கான எச்சரிக்கைகளுக்குப் பின் வழக்கத்தை விட அதிக நோயாளர்கள் இருந்தனர்."],
+      ["100 இல் {b}", "முன்னறிவிப்பு இல்லாமலும் 4 வாரக் காலங்களில் வழக்கத்தை விட அதிக நோயாளர்கள் இருக்கின்றனர்."],
+    ],
+    tested: "விதிகளை 2011 முதல் 2017 வரையான தரவை மட்டும் கொண்டு அமைத்தோம். பின்னர் ஒவ்வொரு சனிக்கிழமையையும் இன்று போலக் கருதி {from} முதல் {to} வரை சோதித்தோம்.",
+    mind: "நினைவில் கொள்ளுங்கள்",
+    minds: [
+      "பொது நோயாளர் அறிக்கைகள் 8 முதல் 11 வாரங்கள் தாமதமாக வருகின்றன. எச்சரிக்கை சாத்தியமாக, கடந்த 4 வாரங்களில் அறிவிக்கப்பட்ட நோயாளர்களைச் சேருங்கள்.",
+      "மழை மட்டும் பலவீனமான அறிகுறி, எனவே மழை மட்டும் கண்காணிப்பை மட்டுமே தரும், எச்சரிக்கையை ஒருபோதும் தராது.",
+      "எலிக்காய்ச்சல் குறைவாக அறிவிக்கப்படுகிறது. உங்கள் மாவட்டத்தை அதன் சொந்தக் கடந்த காலத்துடன் ஒப்பிடுவது இந்தப் பிரச்சினையைக் குறைக்கிறது.",
+      "இது தடுப்பைத் திட்டமிட உதவுகிறது. இது நோயாளர்களைக் கண்டறிவதோ சிகிச்சை ஆலோசனை வழங்குவதோ இல்லை.",
+    ],
+    data: "தரவு எங்கிருந்து வருகிறது",
+    sources: [
+      ["நோயாளர்கள்", "தொற்றுநோயியல் பிரிவு, வாராந்த தொற்றுநோயியல் அறிக்கைகள் ({cases} வரை)"],
+      ["மழை", "Open-Meteo தினசரி மழைவீழ்ச்சி ({om} வரை); கடந்த பருவங்களுக்கு CHIRPS செயற்கைக்கோள் மழைவீழ்ச்சி ({rain} வரை)"],
+      ["வரைபடம்", "geoBoundaries மாவட்ட எல்லைகள்"],
+    ],
+  },
 };
 
-const RULES = [
-  ["Warning", "rain and cases both up", "warning"],
-  ["Any alert", "Watch or Warning", "any_alert"],
-  ["Rain alone", "alert whenever rain is up", "rain_only_rule"],
-  ["Cases alone", "alert whenever cases are up", "cases_only_rule"],
-];
+const fill = (s, v) => s.replace(/\{(\w+)\}/g, (_, k) => v[k] ?? "");
+const pct = (x) => (x == null ? "—" : Math.round(x * 100));
+const fullDay = (iso) => (iso ? `${fmtDay(iso)} ${iso.slice(0, 4)}` : "—");
+const EXAMPLE_DISTRICT = "Kurunegala";
 
-/** How it works: the process and the headline results first; tables and sources on demand. */
-export default function AboutPage({ summary }) {
+/** One numbered step: what to count, then a worked example with the sums written out. */
+function Step({ n, icon, step, vars, result }) {
+  const I = Icon[icon];
+  return (
+    <section className="about-step">
+      <h2><span className="home-num big">{n}</span><span className="home-step-icon"><I /></span>{step.title}</h2>
+      <ol className="about-points">{step.points.map((p, i) => <li key={i}>{p}</li>)}</ol>
+      {vars && (
+        <div className="about-calc">
+          <div className="about-calc-head">{fill(step.example, vars)}</div>
+          {step.lines.map((l, i) => <div key={i}>{fill(l, vars)}</div>)}
+          <div className="about-calc-result">{fill(result, vars)}</div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+export default function AboutPage({ summary, weekly }) {
+  const T = TEXT[useLang()] || TEXT.en;
   const d = summary.data;
-  const caseTo = fmt(d.last_case_report?.slice(0, 7));
-  const held = (L) => summary.pooled?.[L]?.heldout;
-  const h1 = held("1");
+  const ev = weekly?.evaluation;
+  const h1 = ev?.["1"]?.heldout || summary.pooled?.["1"]?.heldout;
+  const h2 = ev?.["2"]?.heldout || summary.pooled?.["2"]?.heldout;
+  const v = {
+    w: pct(h1?.warning?.precision), w2: pct(h2?.warning?.precision), b: pct(h1?.base_rate),
+    from: "2018", to: (d.last_case_report || "").slice(0, 4),
+    cases: fullDay(d.last_case_report), rain: fmt(d.last_rain_month), om: fullDay(weekly?.decided),
+  };
+  // the rain example uses this week's real numbers for one district
+  const ex = weekly?.districts?.[EXAMPLE_DISTRICT]?.["1"];
+  const rainVars = ex && { d: dname(EXAMPLE_DISTRICT), date: fullDay(ex.decided), rd: ex.rainy_days, rn: ex.rainy_days_normal };
 
   return (
-    <div className="page about-page">
+    <div className="page about-page simple">
       <header className="about-intro">
-        <h1>How the Early-Warning System Works</h1>
-        <p className="lead">
-          Learn how rainfall and reported leptospirosis cases help identify periods when disease activity may be higher than usual.
-        </p>
-        <p className="note">New here? Open the <a href="#/">Map</a>, click your district, then open its full report.</p>
+        <h1>{T.title}</h1>
+        <p className="lead">{T.lead}</p>
       </header>
 
-      {/* B: the process */}
-      <section className="about-section" aria-labelledby="how-h">
-        <h2 id="how-h">From rainfall to a warning</h2>
-        <ol className="flow">
-          {STEPS.map(([icon, title, text], i) => {
-            const I = Icon[icon];
-            return (
-              <li key={title} className="flow-step">
-                <span className="flow-icon"><I /></span>
-                <span className="flow-num">Step {i + 1}</span>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </li>
-            );
-          })}
-        </ol>
-        <dl className="level-key">
-          {LEVELS.concat("nodata").map((l) => (
-            <div key={l}>
-              <dt><i className="key" style={{ background: levelColor(l) }} aria-hidden="true" />{LEVEL[l]}</dt>
-              <dd>{LEVEL_TEXT[l]}</dd>
+      <Step n={1} icon="rain" step={T.rainStep} vars={rainVars}
+        result={ex && (ex.rain_signal ? T.rainStep.up : T.rainStep.notUp)} />
+      <Step n={2} icon="cases" step={T.caseStep} vars={{}} result={T.caseStep.up} />
+
+      <section className="about-step">
+        <h2><span className="home-num big">3</span><span className="home-step-icon"><Icon.bell /></span>{T.alertStep}</h2>
+        <div className="home-levels">
+          {["warning", "watch", "normal"].map((l) => (
+            <div key={l} className={`home-level ${l}`}>
+              <div className="home-level-name"><i className="key" style={{ background: levelColor(l) }} />{LEVEL[l]}</div>
+              <p>{T.level[l]}</p>
             </div>
           ))}
-        </dl>
-        <p className="note">Warnings indicate potential increases in activity. They do not guarantee that an outbreak will occur.</p>
-      </section>
-
-      {/* C: headline results */}
-      <section className="about-section" aria-labelledby="rel-h">
-        <h2 id="rel-h">How Reliable Are the Warnings?</h2>
-        <p className="section-sub">The system was evaluated using historical data that was not used to develop the warning rules.</p>
-        <div className="stat-pair">
-          {["1", "2"].map((L) => {
-            const h = held(L);
-            if (!h) return null;
-            return (
-              <div key={L} className="big-stat">
-                <div className="big-stat-label">{L === "1" ? "1 month ahead" : "2 months ahead"}</div>
-                <div className="big-stat-n">{pct(h.warning?.precision)}</div>
-                <p>of Warnings were followed by a month with higher-than-usual reported cases
-                  ({h.warning?.correct} of {h.warning?.alerts}).</p>
-              </div>
-            );
-          })}
         </div>
-        {h1 && (
-          <div className="meaning" role="note">
-            <span className="meaning-icon"><Icon.info /></span>
-            <div>
-              <h3>What does this mean?</h3>
-              <p>
-                The one-month Warning was correct {pct(h1.warning?.precision)} of the time in the historical evaluation.
-                However, months with higher-than-usual activity also occurred by chance {pct(h1.base_rate)} of the time.
-                Warnings should therefore be read as useful signals, not guarantees, and not as the chance of an outbreak.
-              </p>
-            </div>
-          </div>
-        )}
-        <p className="note">Evaluation period: January 2018 to {caseTo}, across all 25 districts.</p>
-        {summary.ml?.["1"] && (
-          <p className="section-sub risk-summary">
-            {summary.ml["1"].passed
-              ? <>District reports also show a <b>risk percentage</b> for next month when that month's case count is known.
-                It passed a calibration check fixed in advance{summary.ml["2"]?.passed ? "" : "; for two months ahead it did not, so none is shown there"}.</>
-              : <>No risk percentage is shown, because the model did not pass its calibration check.</>}
-          </p>
-        )}
-
-        {/* D: detailed tables */}
-        <details className="accordion">
-          <summary>View Detailed Performance Statistics</summary>
-          <div className="accordion-body">
-            <dl className="defs">
-              <div><dt>Correct</dt><dd>Of all alerts a rule raised, the share followed by a month with more cases than usual.</dd></div>
-              <div><dt>Busy months caught</dt><dd>Of all months with more cases than usual, the share that had an alert beforehand.</dd></div>
-              <div><dt>Chance level</dt><dd>How often a month had more cases than usual anyway, with no forecast at all.</dd></div>
-              <div><dt>2011 to 2017</dt><dd>The years used to build the rules, shown for comparison only.</dd></div>
-            </dl>
-            {["1", "2"].map((L) => {
-              const h = held(L), dv = summary.pooled?.[L]?.dev;
-              if (!h) return null;
-              return (
-                <div key={L} className="table-wrap">
-                  <table className="perf">
-                    <caption>{L === "1" ? "One month ahead" : "Two months ahead"} · chance level {pct(h.base_rate)}</caption>
-                    <thead>
-                      <tr>
-                        <th scope="col">Rule</th>
-                        <th scope="col">Correct, 2018 on</th>
-                        <th scope="col">Busy months caught</th>
-                        <th scope="col">Correct / alerts</th>
-                        <th scope="col">Correct, 2011 to 2017</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {RULES.map(([name, sub, k]) => (
-                        <tr key={k}>
-                          <th scope="row">{name}<span>{sub}</span></th>
-                          <td>{pct(h[k]?.precision)}</td>
-                          <td>{pct(h[k]?.recall)}</td>
-                          <td>{h[k]?.correct} / {h[k]?.alerts}</td>
-                          <td>{pct(dv?.[k]?.precision)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              );
-            })}
-            <p className="note">Percentages are past results, not the probability for a coming month.</p>
-          </div>
-        </details>
-
-        {summary.ml && <ModelDetails ml={summary.ml} comparison={summary.model_comparison} />}
+        <p className="about-leads"><b>{T.leads[0]}.</b> {T.leads[1]}</p>
       </section>
 
-      {/* E: limitations */}
-      <section className="about-section" aria-labelledby="lim-h">
-        <h2 id="lim-h">What Should You Keep in Mind?</h2>
-        <ul className="limits-list">
-          <li>
-            <span className="lim-icon"><Icon.rain /></span>
-            <div>
-              <h3>Rainfall is only one signal</h3>
-              <p>Rainfall alone is only slightly better than chance at identifying higher-than-usual activity, so on its own
-                it can raise a Watch but never a Warning. Case counts are needed to confirm a meaningful increase. In testing, last month's case count on its own predicted
-                about as well as the full model, so most of the skill comes from case counts.</p>
+      <section className="about-section">
+        <h2>{T.reliable}</h2>
+        <div className="about-numbers">
+          {T.rows.map(([n, text], i) => (
+            <div key={i} className={`about-number ${i === T.rows.length - 1 ? "muted" : ""}`}>
+              <b>{fill(n, v)}</b>
+              <span>{text}</span>
             </div>
-          </li>
-          <li>
-            <span className="lim-icon"><Icon.file /></span>
-            <div>
-              <h3>Case reports may be incomplete or delayed</h3>
-              <p>Leptospirosis is under-reported, and reporting delays can affect the results. Comparing each district with its
-                own usual level reduces, but does not remove, this effect. The strength of the signal has also changed between
-                periods (compare 2011 to 2017 with 2018 on in the detailed statistics), possibly partly because reporting was
-                disrupted during COVID-19.</p>
-            </div>
-          </li>
-          <li>
-            <span className="lim-icon"><Icon.history /></span>
-            <div>
-              <h3>Historical results do not guarantee future performance</h3>
-              <p>The rules were evaluated on historical data, and future results may differ. Public case reports end in {caseTo},
-                so recent outlooks rely on rainfall and any counts officers add. The risk percentage needs a case count, so
-                it is missing from most outlooks until officers add recent numbers.</p>
-            </div>
-          </li>
+          ))}
+        </div>
+        <p className="note">{fill(T.tested, v)}</p>
+      </section>
+
+      <section className="about-section">
+        <h2>{T.mind}</h2>
+        <ul className="home-know">
+          {T.minds.map((m, i) => <li key={i}><Icon.info />{m}</li>)}
         </ul>
       </section>
 
-      {/* F: sources and method */}
       <section className="about-section">
-        <details className="accordion">
-          <summary>Data Sources and Methodology</summary>
-          <div className="accordion-body">
-            <dl className="sources-dl">
-              <div><dt>Rainfall</dt><dd>CHIRPS daily satellite rainfall, averaged over each district, available to {fmt(d.last_rain_month)}. A rainy day is one with at least 1 mm.</dd></div>
-              <div><dt>Cases</dt><dd>Epidemiology Unit Weekly Epidemiological Reports, with public reports available to {caseTo}.</dd></div>
-              <div><dt>Reporting delay</dt><dd>Public case reports are published about 8 to 11 weeks late.</dd></div>
-              <div><dt>Officer counts</dt><dd>Case numbers entered by district health staff in the district reports.</dd></div>
-              <div><dt>District boundaries</dt><dd>geoBoundaries, licensed CC BY 4.0.</dd></div>
-              <div><dt>Usual levels</dt><dd>Usual rain is the median rainy days for that calendar month in past years. Usual cases are the district's
-                average over its latest 12 complete months, multiplied by the typical ratio for that month, taken as the median over at least
-                five past years. Months with missing reports are left out, not guessed. With fewer than 9 complete months in the last 12, or
-                when the latest public reports are old, the outlook is marked low confidence.</dd></div>
-              {summary.baseline_comparison && <BaselineNote b={summary.baseline_comparison} />}
-              <div><dt>Risk percentage</dt><dd>A logistic regression on the same signals, trained on 2011 to 2017 only. The likely range comes from
-                refitting it on resampled years. When the rule gives a Warning but the model's estimate is below the 2011 to 2017 chance level,
-                or the rule says Normal but the model is as confident as a typical Warning, the report says the signals disagree.</dd></div>
-              <div><dt>Evaluation</dt><dd>Rules were developed on 2011 to 2017 data and evaluated on unseen months from January 2018 to {caseTo},
-                using only data that would have been available when each forecast was made.</dd></div>
-            </dl>
-          </div>
-        </details>
+        <h2>{T.data}</h2>
+        <dl className="about-sources">
+          {T.sources.map(([k, text]) => <div key={k}><dt>{k}</dt><dd>{fill(text, v)}</dd></div>)}
+        </dl>
       </section>
-    </div>
-  );
-}
-
-/** Predicted vs observed, per 10-point band: points on the diagonal mean the percentages can be taken at face value. */
-function Reliability({ bands }) {
-  const W = 270, H = 212, L = 34, B = 36, T = 8, R = 18;
-  const x = (v) => L + v * (W - L - R), y = (v) => H - B - v * (H - B - T);
-  const max = Math.max(...bands.map((b) => b.n));
-  return (
-    <svg className="reliability" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Calibration chart: predicted against observed share">
-      <path className="rel-band" d={`M${x(0)},${y(0.1)} L${x(0.9)},${y(1)} L${x(1)},${y(1)} L${x(1)},${y(0.9)} L${x(0.1)},${y(0)} L${x(0)},${y(0)} Z`} />
-      <line className="rel-diag" x1={x(0)} y1={y(0)} x2={x(1)} y2={y(1)} />
-      {[0, 0.5, 1].map((v) => (
-        <g key={v}>
-          <text x={x(v)} y={H - B + 14} textAnchor="middle">{v * 100}%</text>
-          <text x={L - 6} y={y(v) + 3.5} textAnchor="end">{v * 100}%</text>
-        </g>
-      ))}
-      <text x={(L + W - R) / 2} y={H - 3} textAnchor="middle" className="axis-label">predicted</text>
-      {bands.map((b) => (
-        <circle key={b.from} cx={x(b.predicted)} cy={y(b.observed)} r={2.5 + 5 * Math.sqrt(b.n / max)}
-          className={b.counted ? (b.ok ? "rel-pt" : "rel-pt off") : "rel-pt few"}>
-          <title>{`${Math.round(b.from * 100)} to ${Math.round(b.to * 100)}%: predicted ${Math.round(b.predicted * 100)}%, observed ${Math.round(b.observed * 100)}% (${b.n} months)`}</title>
-        </circle>
-      ))}
-    </svg>
-  );
-}
-
-function ModelDetails({ ml, comparison }) {
-  return (
-    <details className="accordion">
-      <summary>Risk Percentage and Model Comparison</summary>
-      <div className="accordion-body">
-        <p className="note">
-          The pass mark was fixed before testing: on 2018 onwards the model must beat always predicting the 2011 to 2017 chance level
-          (Brier score, lower is better), and in every 10-point band with at least 30 months, its average prediction must be within
-          10 points of what really happened.
-        </p>
-        <div className="cal-grid">
-          {["1", "2"].map((L) => {
-            const m = ml[L];
-            if (!m) return null;
-            const c = m.report.calibration, w = m.report.without_case_count;
-            return (
-              <div key={L} className="cal-card">
-                <h3>{L === "1" ? "One month ahead" : "Two months ahead"} · <span className={m.passed ? "pass" : "fail"}>{m.passed ? "passed" : "did not pass"}</span></h3>
-                <Reliability bands={c.bands} />
-                <p className="note">
-                  Brier {c.brier} vs {c.brier_base_rate} for the chance level · ranking (AUC) {m.report.auc} · {m.method}.
-                  {m.tried.length > 1 ? " Recalibration on 2016 to 2017 was also tried." : ""}
-                </p>
-                {w && (
-                  <p className="note">Months without a case count ({w.months}): predicted {Math.round(w.predicted * 100)}%,
-                    observed {Math.round(w.observed * 100)}%. This is why no percentage is shown without a count.</p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-        <p className="note">Each dot is a 10-point band of predictions (across) against how often those months really were busier (up), sized by how
-          many months it holds. The shaded strip is within 10 points of the diagonal. Hollow dots hold fewer than 30 months and are not counted.</p>
-
-        {comparison && ["1", "2"].map((L) => {
-          const c = comparison.lags?.[L];
-          if (!c) return null;
-          return (
-            <div key={L} className="table-wrap">
-              <table className="perf">
-                <caption>{L === "1" ? "One month ahead" : "Two months ahead"} · every method trained on 2011 to 2017, tested on 2018 on</caption>
-                <thead>
-                  <tr><th scope="col">Method</th><th scope="col">Ranking (AUC)</th><th scope="col">Brier</th>
-                    <th scope="col">Correct, top {c.alerts_k} months</th></tr>
-                </thead>
-                <tbody>
-                  {c.rows.map((r) => (
-                    <tr key={r.method}>
-                      <th scope="row">{r.method}<span>{r.what}</span></th>
-                      <td>{r.auc?.toFixed(3)}</td>
-                      <td>{r.brier == null ? "—" : r.brier.toFixed(3)}</td>
-                      <td>{r.precision_at_k == null ? "—" : `${Math.round(r.precision_at_k * 100)}%`}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          );
-        })}
-        {comparison && (
-          <p className="note">AUC: how well a method ranks busier months above quieter ones (0.5 is guessing). "Correct, top" gives every method the
-            same number of alerts as the rule's Warnings. Brier is only shown for methods that give a probability.</p>
-        )}
-      </div>
-    </details>
-  );
-}
-
-/** The proposal's check of a simpler usual level, reported with its outcome and the reason for the choice in use. */
-function BaselineNote({ b }) {
-  const h = b.heldout_2018_on;
-  const p = (v) => `${Math.round(v * 100)}%`;
-  return (
-    <div>
-      <dt>Simpler usual level tested</dt>
-      <dd>
-        On 2011 to 2017 we compared the usual level above with the median of the same month over the last three years.
-        The 3-year median was steadier ({b.three_year.year_to_year_change} vs {b.current.year_to_year_change} typical yearly change) and flagged
-        more sharp rises ({p(b.three_year.real_rises_flagged)} vs {p(b.current.real_rises_flagged)}), but fitted actual months less well
-        ({b.three_year.typical_error} vs {b.current.typical_error} typical error).
-        {h && <> On 2018 onwards it would call {p(h.three_year["1"].base_rate)} of all months above usual (against {p(h.current["1"].base_rate)}),
-          and its Warnings beat chance by {h.three_year["1"].lift}x against {h.current["1"].lift}x.</>}
-        {" "}{b.in_use === "current" ? "The current usual level is kept." : "The 3-year median is in use."}
-      </dd>
     </div>
   );
 }

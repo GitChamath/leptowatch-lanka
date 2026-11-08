@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-/** Hash routes, so the plain Python server needs no changes: #/, #/district/<name>, #/history, #/about. */
+/** Hash routes, so the plain Python server needs no changes: #/ (home), #/map, #/district/<name>, #/history, #/about. */
 const parse = () => {
   const [, page = "", ...rest] = (window.location.hash || "#/").slice(1).split("/");
-  return { page: page || "map", param: rest.length ? decodeURIComponent(rest.join("/")) : null };
+  return { page: page || "home", param: rest.length ? decodeURIComponent(rest.join("/")) : null };
 };
 
 export function useRoute() {

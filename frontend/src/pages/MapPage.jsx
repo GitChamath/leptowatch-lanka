@@ -3,44 +3,62 @@ import { motion } from "framer-motion";
 import MapView from "../components/MapView.jsx";
 import Panel from "../components/Panel.jsx";
 import { AnimatedNumber, Segmented } from "../components/bits.jsx";
-import { LEVEL, LEVELS, LEVEL_MEANING, fmt, levelColor } from "../lib.js";
+import { LEVEL, LEVELS, LEVEL_MEANING, fmt, fmtDay, levelColor, rainOnly, whenLabel } from "../lib.js";
+import { t } from "../i18n.js";
 
 /** Count of districts at each level, and the Warning/Watch districts in priority order. */
-export function useTally(summary, levelOf) {
+export function useTally(summary, levelOf, keep = ALL) {
   return useMemo(() => {
     const tally = { warning: 0, watch: 0, normal: 0 };
     const rank = { warning: 0, watch: 1 };
-    const names = summary ? Object.keys(summary.districts) : [];
+    const names = summary ? Object.keys(summary.districts).filter(keep) : [];
     names.forEach((n) => { const l = levelOf(n); if (l in tally) tally[l]++; });
     const attention = names.filter((n) => levelOf(n) in rank)
       .sort((a, b) => rank[levelOf(a)] - rank[levelOf(b)] || a.localeCompare(b))
       .map((n) => ({ name: n, level: levelOf(n) }));
     return { tally, attention };
-  }, [summary, levelOf]);
+  }, [summary, levelOf, keep]);
 }
+const ALL = () => true;
 
-export function Counts({ tally }) {
+export function Counts({ tally, rainCount }) {
   return (
     <div className="counts">
       {LEVELS.map((l) => (
         <motion.div key={l} className="count" layout>
           <i className="key" style={{ background: levelColor(l) }} />
           <b><AnimatedNumber value={tally[l]} duration={0.5} /></b>{LEVEL[l]}
+          {l === "watch" && rainCount > 0 && <small>({rainCount} {t("rain_only")})</small>}
         </motion.div>
       ))}
     </div>
   );
 }
 
-export function Legend() {
+export function Legend({ soft = false }) {
+  const items = [...LEVELS, "nodata"].flatMap((l) => (soft && l === "watch" ? [l, "watch_rain"] : [l]));
   return (
     <div className="legend glass">
-      {[...LEVELS, "nodata"].map((l) => <span key={l}><i className="key" style={{ background: levelColor(l) }} /><b>{LEVEL[l]}</b><em>{LEVEL_MEANING[l]}</em></span>)}
+      {items.map((l) => (
+        <span key={l}><i className="key" style={{ background: levelColor(l) }} />
+          <b>{l === "watch_rain" ? `${LEVEL.watch} · ${t("rain_only")}` : LEVEL[l]}</b>
+          <em>{l === "watch_rain" ? t("watch_rain_meaning") : LEVEL_MEANING[l]}</em></span>
+      ))}
     </div>
   );
 }
 
-export default function MapPage({ summary, geo, lag, onLag, getDistrict }) {
+/** The record behind a map view: weekly ("w1", "w2") or monthly ("1", "2"). */
+export const recordOf = (summary, weekly, view, n) => (view.startsWith("w")
+  ? weekly?.districts?.[n]?.[view.slice(1)] : summary.districts?.[n]?.current?.[view]);
+
+/** Switcher options: weekly first when available, then the two monthly outlooks. */
+export const viewOptions = (summary, weekly) => (weekly
+  ? [["w1", t("wk_next")], ["w2", t("wk_after")]]
+  : summary.horizon.map((m, i) => [String(i + 1), `${fmt(m)} · ${whenLabel(m)}`]));
+
+export default function MapPage({ summary, geo, view, onView, weekly, getDistrict, onSaveWeekly }) {
+  const lag = view;
   const [selected, setSelected] = useState(null);
   const [detail, setDetail] = useState(null);
 
@@ -52,8 +70,16 @@ export default function MapPage({ summary, geo, lag, onLag, getDistrict }) {
     return () => { live = false; };
   }, [selected, summary]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const levelOf = useCallback((n) => summary.districts?.[n]?.current?.[lag]?.level || "nodata", [summary, lag]);
-  const { tally, attention } = useTally(summary, levelOf);
+  const levelOf = useCallback((n) => recordOf(summary, weekly, view, n)?.level || "nodata", [summary, weekly, view]);
+  const { tally, attention: byLevel } = useTally(summary, levelOf);
+  const soft = view.startsWith("w");                    // the weekly outlook marks rain-only Watches
+  const softOf = useCallback((n) => soft && rainOnly(recordOf(summary, weekly, view, n)), [soft, summary, weekly, view]);
+  const rainCount = useMemo(() => Object.keys(summary.districts).filter(softOf).length, [summary, softOf]);
+  const attention = useMemo(() => byLevel
+    .map((a) => ({ ...a, hp: !!recordOf(summary, weekly, view, a.name)?.risk?.high_priority, rain: softOf(a.name) }))
+    .sort((a, b) => b.hp - a.hp || a.rain - b.rain), [byLevel, summary, weekly, view, softOf]);
+  const wrec = view.startsWith("w") ? weekly?.districts?.[Object.keys(weekly?.districts || {})[0]]?.[view.slice(1)] : null;
+  const target = wrec ? t("wk_range", { from: fmtDay(wrec.target_from), to: fmtDay(wrec.target_end) }) : fmt(summary.horizon[+view - 1]);
 
   const select = (n) => {
     setSelected(n);
@@ -64,19 +90,19 @@ export default function MapPage({ summary, geo, lag, onLag, getDistrict }) {
   return (
     <>
       <div className="toolbar">
-        <Segmented label="Forecast" value={lag} onChange={onLag}
-          options={summary.horizon.map((m, i) => [String(i + 1), `${fmt(m)} · ${i === 0 ? "next month" : "month after"}`])} />
-        <Counts tally={tally} />
+        <Segmented label="Forecast" value={view} onChange={onView} options={viewOptions(summary, weekly)} />
+        <Counts tally={tally} rainCount={rainCount} />
       </div>
       <main className="layout">
         <motion.section className="mapcard" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.1 }}>
-          <Legend />
+          <Legend soft={soft} />
           <div className="map-area">
-            <MapView geo={geo} levelOf={levelOf} selected={selected} onSelect={select} />
+            <MapView geo={geo} levelOf={levelOf} softOf={softOf} selected={selected} onSelect={select} />
           </div>
           <Panel selected={selected} detail={detail} mode="outlook" lag={lag} tally={tally}
-            target={fmt(summary.horizon[+lag - 1])} rainMonth={summary.data.last_rain_month}
-            onClose={() => setSelected(null)} attention={attention} onPick={select} />
+            weeklyRec={selected && view.startsWith("w") ? recordOf(summary, weekly, view, selected) : null}
+            target={target} rainMonth={wrec ? null : summary.data.last_rain_month} weeklyTo={wrec?.decided}
+            onClose={() => setSelected(null)} attention={attention} onPick={select} onSaveWeekly={onSaveWeekly} />
         </motion.section>
       </main>
     </>
