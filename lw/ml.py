@@ -28,7 +28,8 @@ CAL_MIN_BAND = 30
 CAL_MAX_GAP = 0.10
 L2 = 1.0
 BOOTSTRAPS = 25
-RECAL_TRAIN_END = "2016-01"        # recalibration route: model on targets before this, Platt on the rest of dev
+HIGH_PRIORITY_SHARE = 0.10         # high-priority Warning: percentage in the top 10% of development months
+RECAL_TRAIN_END = "2016-01"       # recalibration route: model on targets before this, Platt on the rest of dev
 FEATURES = ["bias", "rain anomaly", "rain signal", "case anomaly", "case signal", "case missing", "season sin", "season cos"]
 
 
@@ -208,11 +209,19 @@ def train_lag(recs, lag):
     dis = [(r, p) for r, p in zip(test, p_test)
            if (r["level"] == "warning" and p < th_low) or (r["level"] == "normal" and p >= th_high)]
 
+    # High-priority Warning: a Warning whose percentage is in the top 10% of development months (threshold from 2011-2017)
+    p_dev = sorted((prob(model, x) for x in _xy(dev)[0]), reverse=True)
+    th_hp = p_dev[int(HIGH_PRIORITY_SHARE * len(p_dev))]
+    hp = {period: _hp_record([(r, prob(model, features(r))) for r in recs_], th_hp)
+          for period, recs_ in (("dev", dev), ("heldout", test))}
+
     return {
         "lag": lag, "method": method, "passed": check["passed"], "tried": tried,
         "model": {"w": [round(v, 6) for v in model["w"]], "platt": model["platt"]},
         "boot": [[round(v, 6) for v in w] for w in _bootstrap(boot_recs, BOOTSTRAPS, seed=lag)],
-        "thresholds": {"warning_below": round(th_low, 3), "normal_at_or_above": round(th_high, 3)},
+        "thresholds": {"warning_below": round(th_low, 3), "normal_at_or_above": round(th_high, 3),
+                       "high_priority": round(th_hp, 3)},
+        "high_priority": hp,
         "report": {
             "train_months": len(dev), "test_months": len(test), "base_rate_dev": round(base_dev, 3),
             "base_rate_test": round(sum(yt) / len(yt), 3), "auc": round(auc(p_test, yt), 3),
@@ -223,6 +232,16 @@ def train_lag(recs, lag):
                               "above_normal_share": round(sum(r["outcome"] for r, _ in dis) / len(dis), 3) if dis else None},
         },
     }
+
+
+def _hp_record(pairs, th):
+    """How often a high-priority Warning was right, and what share of above-normal months it caught."""
+    flagged = [r for r, p in pairs if r["level"] == "warning" and features(r)[5] == 0.0 and p >= th]
+    right, pos = sum(r["outcome"] for r in flagged), sum(r["outcome"] for r, _ in pairs)
+    return {"alerts": len(flagged), "right": right,
+            "precision": round(right / len(flagged), 3) if flagged else None,
+            "recall": round(right / pos, 3) if pos else None,
+            "share_of_months": round(len(flagged) / len(pairs), 3) if pairs else None}
 
 
 def _subgroup(pairs):
@@ -249,7 +268,9 @@ def risk(m, a):
     lo, hi = spread[int(0.1 * (len(spread) - 1))], spread[int(round(0.9 * (len(spread) - 1)))]
     th = m["thresholds"]
     disagree = (a["level"] == "warning" and p < th["warning_below"]) or (a["level"] == "normal" and p >= th["normal_at_or_above"])
-    return {"p": round(p, 3), "low": round(min(lo, p), 3), "high": round(max(hi, p), 3), "disagree": disagree}
+    high_priority = a["level"] == "warning" and th.get("high_priority") is not None and p >= th["high_priority"]
+    return {"p": round(p, 3), "low": round(min(lo, p), 3), "high": round(max(hi, p), 3), "disagree": disagree,
+            "high_priority": high_priority}
 
 
 # ---------------------------------------------------------------- small gradient-boosted trees (comparison only)

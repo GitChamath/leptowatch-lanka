@@ -65,6 +65,14 @@ class Risk(unittest.TestCase):
         self.assertTrue(r["disagree"])
         self.assertFalse(ml.risk(self.model, outlook(level="watch", cases=12))["disagree"])
 
+    def test_high_priority_needs_a_warning_and_a_high_estimate(self):
+        m = dict(self.model, thresholds={**self.model["thresholds"], "high_priority": 0.45})   # 50% clears 0.45
+        self.assertTrue(ml.risk(m, outlook(level="warning", cases=12))["high_priority"])
+        self.assertFalse(ml.risk(m, outlook(level="watch", cases=12))["high_priority"])         # never above a Watch
+        strict = dict(self.model, thresholds={**self.model["thresholds"], "high_priority": 0.6})
+        self.assertFalse(ml.risk(strict, outlook(level="warning", cases=12))["high_priority"])
+        self.assertFalse(ml.risk(self.model, outlook(level="warning", cases=12))["high_priority"])  # older state: no threshold
+
 
 class Trees(unittest.TestCase):
     def test_boosted_trees_learn_a_threshold(self):

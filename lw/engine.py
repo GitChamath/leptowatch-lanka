@@ -189,7 +189,7 @@ def build_state(con, districts=None, ml_model=None):
     for d in state["districts"].values():
         for lag, a in d["current"].items():
             a["risk"] = ml.risk(state["ml"].get(lag), a)
-    for name in ("model_comparison", "baseline_comparison"):
+    for name in ("model_comparison", "baseline_comparison", "signal_test", "accuracy_v2"):
         f = config.DATA / f"{name}.json"
         if f.exists():
             state[name] = json.loads(f.read_text(encoding="utf-8"))

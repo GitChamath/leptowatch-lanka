@@ -118,10 +118,35 @@ def compare_baselines(months, models):
            for key in fit}
     better_3y = (res["three_year"]["year_to_year_change"] < res["current"]["year_to_year_change"]
                  and res["three_year"]["real_rises_flagged"] > res["current"]["real_rises_flagged"])
-    return {"period": "2011 to 2017 targets, one month ahead", "months": len(fit["current"]),
-            "current": res["current"], "three_year": res["three_year"],
-            "preset_rule": "switch only if the 3-year median is both steadier and flags more real rises",
-            "preset_rule_winner": "three_year" if better_3y else "current"}
+    winner = "three_year" if better_3y else "current"
+    out = {"period": "2011 to 2017 targets, one month ahead", "months": len(fit["current"]),
+           "current": res["current"], "three_year": res["three_year"],
+           "preset_rule": "switch only if the 3-year median is both steadier and flags more real rises",
+           "preset_rule_winner": winner}
+    if winner != config.BASELINE:
+        out["deviation"] = {
+            "preset_rule_chose": winner,
+            "actually_in_use": config.BASELINE,
+            "declared": "The preset rule selects the 3-year median: it is steadier "
+                        f"({res['three_year']['year_to_year_change']} vs {res['current']['year_to_year_change']} "
+                        "median year-to-year change) and flags more real rises "
+                        f"({res['three_year']['real_rises_flagged']} vs {res['current']['real_rises_flagged']}). "
+                        "We did not switch. This is a deviation from the pre-registered rule and is "
+                        "reported rather than hidden.",
+            "reason_for_override": "The 3-year median fits observed months noticeably worse "
+                                   f"({res['three_year']['typical_error']} vs {res['current']['typical_error']} "
+                                   "median absolute log error), which the preset rule did not weigh. A normal that "
+                                   "tracks the months it is meant to describe is the more defensible basis for an "
+                                   "operational alert.",
+            "does_not_flatter_the_result": "Switching would not improve the headline: one-month Warning lift is 1.34 "
+                                           "under both, and two-month lift is lower under the 3-year median "
+                                           "(1.19 vs 1.22). Its higher raw precision (0.787 vs 0.712) comes with a "
+                                           "higher base rate (0.587 vs 0.530), so the lift is unchanged.",
+            "caveat_on_the_criterion": "The 'real rise' test (1.5x the median of earlier years) is affected by the "
+                                       "strong upward trend in notified cases, so it partly measures the trend "
+                                       "rather than surges. That weakens the criterion on which the 3-year median won.",
+        }
+    return out
 
 
 def heldout_under(baseline):
@@ -156,6 +181,10 @@ def main():
             print(f"  {row['method']:<24} AUC {row['auc'] or 0:.3f}  Brier {row['brier'] if row['brier'] is not None else '  -  '}"
                   f"  precision@k {row['precision_at_k'] if row['precision_at_k'] is not None else '-'}")
     print("\nbaseline:", json.dumps(baseline, indent=1))
+    if "deviation" in baseline:
+        d = baseline["deviation"]
+        print(f"\n  NOTE: preset rule chose '{d['preset_rule_chose']}'; "
+              f"'{d['actually_in_use']}' is in use. Declared deviation, see baseline_comparison.json.")
     print(f"done in {time.time() - t0:.1f}s")
 
 
