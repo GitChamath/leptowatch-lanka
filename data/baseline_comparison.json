@@ -1,0 +1,57 @@
+{
+ "period": "2011 to 2017 targets, one month ahead",
+ "months": 981,
+ "current": {
+  "typical_error": 0.464,
+  "year_to_year_change": 0.398,
+  "real_rises": 276,
+  "real_rises_flagged": 0.844
+ },
+ "three_year": {
+  "typical_error": 0.511,
+  "year_to_year_change": 0.201,
+  "real_rises": 276,
+  "real_rises_flagged": 0.909
+ },
+ "preset_rule": "switch only if the 3-year median is both steadier and flags more real rises",
+ "preset_rule_winner": "three_year",
+ "deviation": {
+  "preset_rule_chose": "three_year",
+  "actually_in_use": "current",
+  "declared": "The preset rule selects the 3-year median: it is steadier (0.201 vs 0.398 median year-to-year change) and flags more real rises (0.909 vs 0.844). We did not switch. This is a deviation from the pre-registered rule and is reported rather than hidden.",
+  "reason_for_override": "The 3-year median fits observed months noticeably worse (0.511 vs 0.464 median absolute log error), which the preset rule did not weigh. A normal that tracks the months it is meant to describe is the more defensible basis for an operational alert.",
+  "does_not_flatter_the_result": "Switching would not improve the headline: one-month Warning lift is 1.34 under both, and two-month lift is lower under the 3-year median (1.19 vs 1.22). Its higher raw precision (0.787 vs 0.712) comes with a higher base rate (0.587 vs 0.530), so the lift is unchanged.",
+  "caveat_on_the_criterion": "The 'real rise' test (1.5x the median of earlier years) is affected by the strong upward trend in notified cases, so it partly measures the trend rather than surges. That weakens the criterion on which the 3-year median won."
+ },
+ "heldout_2018_on": {
+  "current": {
+   "1": {
+    "base_rate": 0.53,
+    "warning_precision": 0.712,
+    "warning_recall": 0.396,
+    "lift": 1.34
+   },
+   "2": {
+    "base_rate": 0.537,
+    "warning_precision": 0.654,
+    "warning_recall": 0.355,
+    "lift": 1.22
+   }
+  },
+  "three_year": {
+   "1": {
+    "base_rate": 0.587,
+    "warning_precision": 0.787,
+    "warning_recall": 0.415,
+    "lift": 1.34
+   },
+   "2": {
+    "base_rate": 0.587,
+    "warning_precision": 0.698,
+    "warning_recall": 0.366,
+    "lift": 1.19
+   }
+  }
+ },
+ "in_use": "current"
+}

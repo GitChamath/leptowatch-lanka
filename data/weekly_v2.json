@@ -1,0 +1,408 @@
+{
+ "rule": "Warning = rainy days in the last 8 weeks above usual AND cases in the last 4 weeks above 1.4 x usual; Watch = one signal up",
+ "results": {
+  "current": {
+   "1": {
+    "dev": {
+     "months": 2349,
+     "base_rate": 0.461,
+     "warning": {
+      "alerts": 374,
+      "correct": 241,
+      "precision": 0.644,
+      "recall": 0.223,
+      "lift": 1.4
+     },
+     "any_alert": {
+      "alerts": 1434,
+      "correct": 770,
+      "precision": 0.537,
+      "recall": 0.712,
+      "lift": 1.17
+     },
+     "rain_only_rule": {
+      "alerts": 1043,
+      "correct": 561,
+      "precision": 0.538,
+      "recall": 0.518,
+      "lift": 1.17
+     },
+     "cases_only_rule": {
+      "alerts": 765,
+      "correct": 450,
+      "precision": 0.588,
+      "recall": 0.416,
+      "lift": 1.28
+     }
+    },
+    "heldout": {
+     "months": 5757,
+     "base_rate": 0.539,
+     "warning": {
+      "alerts": 1678,
+      "correct": 1162,
+      "precision": 0.692,
+      "recall": 0.374,
+      "lift": 1.28
+     },
+     "any_alert": {
+      "alerts": 4448,
+      "correct": 2665,
+      "precision": 0.599,
+      "recall": 0.859,
+      "lift": 1.11
+     },
+     "rain_only_rule": {
+      "alerts": 3276,
+      "correct": 1947,
+      "precision": 0.594,
+      "recall": 0.627,
+      "lift": 1.1
+     },
+     "cases_only_rule": {
+      "alerts": 2850,
+      "correct": 1880,
+      "precision": 0.66,
+      "recall": 0.606,
+      "lift": 1.22
+     }
+    }
+   },
+   "2": {
+    "dev": {
+     "months": 2173,
+     "base_rate": 0.47,
+     "warning": {
+      "alerts": 292,
+      "correct": 181,
+      "precision": 0.62,
+      "recall": 0.177,
+      "lift": 1.32
+     },
+     "any_alert": {
+      "alerts": 1370,
+      "correct": 727,
+      "precision": 0.531,
+      "recall": 0.712,
+      "lift": 1.13
+     },
+     "rain_only_rule": {
+      "alerts": 1077,
+      "correct": 587,
+      "precision": 0.545,
+      "recall": 0.575,
+      "lift": 1.16
+     },
+     "cases_only_rule": {
+      "alerts": 585,
+      "correct": 321,
+      "precision": 0.549,
+      "recall": 0.314,
+      "lift": 1.17
+     }
+    },
+    "heldout": {
+     "months": 5586,
+     "base_rate": 0.542,
+     "warning": {
+      "alerts": 1695,
+      "correct": 1076,
+      "precision": 0.635,
+      "recall": 0.356,
+      "lift": 1.17
+     },
+     "any_alert": {
+      "alerts": 4429,
+      "correct": 2525,
+      "precision": 0.57,
+      "recall": 0.835,
+      "lift": 1.05
+     },
+     "rain_only_rule": {
+      "alerts": 3330,
+      "correct": 1925,
+      "precision": 0.578,
+      "recall": 0.636,
+      "lift": 1.07
+     },
+     "cases_only_rule": {
+      "alerts": 2794,
+      "correct": 1676,
+      "precision": 0.6,
+      "recall": 0.554,
+      "lift": 1.11
+     }
+    }
+   }
+  },
+  "rain_8_weeks": {
+   "1": {
+    "dev": {
+     "months": 2349,
+     "base_rate": 0.461,
+     "warning": {
+      "alerts": 435,
+      "correct": 297,
+      "precision": 0.683,
+      "recall": 0.274,
+      "lift": 1.48
+     },
+     "any_alert": {
+      "alerts": 1491,
+      "correct": 801,
+      "precision": 0.537,
+      "recall": 0.74,
+      "lift": 1.17
+     },
+     "rain_only_rule": {
+      "alerts": 1164,
+      "correct": 649,
+      "precision": 0.558,
+      "recall": 0.6,
+      "lift": 1.21
+     },
+     "cases_only_rule": {
+      "alerts": 765,
+      "correct": 450,
+      "precision": 0.588,
+      "recall": 0.416,
+      "lift": 1.28
+     }
+    },
+    "heldout": {
+     "months": 5757,
+     "base_rate": 0.539,
+     "warning": {
+      "alerts": 1936,
+      "correct": 1323,
+      "precision": 0.683,
+      "recall": 0.426,
+      "lift": 1.27
+     },
+     "any_alert": {
+      "alerts": 4582,
+      "correct": 2714,
+      "precision": 0.592,
+      "recall": 0.875,
+      "lift": 1.1
+     },
+     "rain_only_rule": {
+      "alerts": 3682,
+      "correct": 2164,
+      "precision": 0.588,
+      "recall": 0.697,
+      "lift": 1.09
+     },
+     "cases_only_rule": {
+      "alerts": 2850,
+      "correct": 1880,
+      "precision": 0.66,
+      "recall": 0.606,
+      "lift": 1.22
+     }
+    }
+   },
+   "2": {
+    "dev": {
+     "months": 2173,
+     "base_rate": 0.47,
+     "warning": {
+      "alerts": 329,
+      "correct": 215,
+      "precision": 0.653,
+      "recall": 0.211,
+      "lift": 1.39
+     },
+     "any_alert": {
+      "alerts": 1403,
+      "correct": 763,
+      "precision": 0.544,
+      "recall": 0.747,
+      "lift": 1.16
+     },
+     "rain_only_rule": {
+      "alerts": 1150,
+      "correct": 658,
+      "precision": 0.572,
+      "recall": 0.644,
+      "lift": 1.22
+     },
+     "cases_only_rule": {
+      "alerts": 585,
+      "correct": 321,
+      "precision": 0.549,
+      "recall": 0.314,
+      "lift": 1.17
+     }
+    },
+    "heldout": {
+     "months": 5586,
+     "base_rate": 0.542,
+     "warning": {
+      "alerts": 1945,
+      "correct": 1235,
+      "precision": 0.635,
+      "recall": 0.408,
+      "lift": 1.17
+     },
+     "any_alert": {
+      "alerts": 4524,
+      "correct": 2574,
+      "precision": 0.569,
+      "recall": 0.851,
+      "lift": 1.05
+     },
+     "rain_only_rule": {
+      "alerts": 3689,
+      "correct": 2139,
+      "precision": 0.58,
+      "recall": 0.707,
+      "lift": 1.07
+     },
+     "cases_only_rule": {
+      "alerts": 2794,
+      "correct": 1676,
+      "precision": 0.6,
+      "recall": 0.554,
+      "lift": 1.11
+     }
+    }
+   }
+  },
+  "chosen": {
+   "1": {
+    "dev": {
+     "months": 2349,
+     "base_rate": 0.461,
+     "warning": {
+      "alerts": 312,
+      "correct": 225,
+      "precision": 0.721,
+      "recall": 0.208,
+      "lift": 1.57
+     },
+     "any_alert": {
+      "alerts": 1491,
+      "correct": 801,
+      "precision": 0.537,
+      "recall": 0.74,
+      "lift": 1.17
+     },
+     "rain_only_rule": {
+      "alerts": 1164,
+      "correct": 649,
+      "precision": 0.558,
+      "recall": 0.6,
+      "lift": 1.21
+     },
+     "cases_only_rule": {
+      "alerts": 765,
+      "correct": 450,
+      "precision": 0.588,
+      "recall": 0.416,
+      "lift": 1.28
+     }
+    },
+    "heldout": {
+     "months": 5757,
+     "base_rate": 0.539,
+     "warning": {
+      "alerts": 1239,
+      "correct": 890,
+      "precision": 0.718,
+      "recall": 0.287,
+      "lift": 1.33
+     },
+     "any_alert": {
+      "alerts": 4582,
+      "correct": 2714,
+      "precision": 0.592,
+      "recall": 0.875,
+      "lift": 1.1
+     },
+     "rain_only_rule": {
+      "alerts": 3682,
+      "correct": 2164,
+      "precision": 0.588,
+      "recall": 0.697,
+      "lift": 1.09
+     },
+     "cases_only_rule": {
+      "alerts": 2850,
+      "correct": 1880,
+      "precision": 0.66,
+      "recall": 0.606,
+      "lift": 1.22
+     }
+    }
+   },
+   "2": {
+    "dev": {
+     "months": 2173,
+     "base_rate": 0.47,
+     "warning": {
+      "alerts": 231,
+      "correct": 151,
+      "precision": 0.654,
+      "recall": 0.148,
+      "lift": 1.39
+     },
+     "any_alert": {
+      "alerts": 1403,
+      "correct": 763,
+      "precision": 0.544,
+      "recall": 0.747,
+      "lift": 1.16
+     },
+     "rain_only_rule": {
+      "alerts": 1150,
+      "correct": 658,
+      "precision": 0.572,
+      "recall": 0.644,
+      "lift": 1.22
+     },
+     "cases_only_rule": {
+      "alerts": 585,
+      "correct": 321,
+      "precision": 0.549,
+      "recall": 0.314,
+      "lift": 1.17
+     }
+    },
+    "heldout": {
+     "months": 5586,
+     "base_rate": 0.542,
+     "warning": {
+      "alerts": 1253,
+      "correct": 831,
+      "precision": 0.663,
+      "recall": 0.275,
+      "lift": 1.22
+     },
+     "any_alert": {
+      "alerts": 4524,
+      "correct": 2574,
+      "precision": 0.569,
+      "recall": 0.851,
+      "lift": 1.05
+     },
+     "rain_only_rule": {
+      "alerts": 3689,
+      "correct": 2139,
+      "precision": 0.58,
+      "recall": 0.707,
+      "lift": 1.07
+     },
+     "cases_only_rule": {
+      "alerts": 2794,
+      "correct": 1676,
+      "precision": 0.6,
+      "recall": 0.554,
+      "lift": 1.11
+     }
+    }
+   }
+  }
+ },
+ "adopted": true
+}

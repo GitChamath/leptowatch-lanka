@@ -1,0 +1,356 @@
+{
+ "preregistration": "research/PREREG_new_signals.md",
+ "neighbours": {
+  "Ampara": [
+   "Badulla",
+   "Batticaloa",
+   "Hambantota",
+   "Matale",
+   "Monaragala",
+   "Polonnaruwa"
+  ],
+  "Anuradhapura": [
+   "Kurunegala",
+   "Mannar",
+   "Matale",
+   "Polonnaruwa",
+   "Puttalam",
+   "Trincomalee",
+   "Vavuniya"
+  ],
+  "Badulla": [
+   "Ampara",
+   "Kandy",
+   "Matale",
+   "Monaragala",
+   "Nuwara Eliya",
+   "Ratnapura"
+  ],
+  "Batticaloa": [
+   "Ampara",
+   "Polonnaruwa",
+   "Trincomalee"
+  ],
+  "Colombo": [
+   "Gampaha",
+   "Kalutara",
+   "Kegalle",
+   "Ratnapura"
+  ],
+  "Galle": [
+   "Kalutara",
+   "Matara",
+   "Ratnapura"
+  ],
+  "Gampaha": [
+   "Colombo",
+   "Kegalle",
+   "Kurunegala",
+   "Puttalam"
+  ],
+  "Hambantota": [
+   "Ampara",
+   "Matara",
+   "Monaragala",
+   "Ratnapura"
+  ],
+  "Jaffna": [
+   "Kilinochchi",
+   "Mullaitivu"
+  ],
+  "Kalutara": [
+   "Colombo",
+   "Galle",
+   "Ratnapura"
+  ],
+  "Kandy": [
+   "Badulla",
+   "Kegalle",
+   "Kurunegala",
+   "Matale",
+   "Nuwara Eliya"
+  ],
+  "Kegalle": [
+   "Colombo",
+   "Gampaha",
+   "Kandy",
+   "Kurunegala",
+   "Nuwara Eliya",
+   "Ratnapura"
+  ],
+  "Kilinochchi": [
+   "Jaffna",
+   "Mannar",
+   "Mullaitivu"
+  ],
+  "Kurunegala": [
+   "Anuradhapura",
+   "Gampaha",
+   "Kandy",
+   "Kegalle",
+   "Matale",
+   "Puttalam"
+  ],
+  "Mannar": [
+   "Anuradhapura",
+   "Kilinochchi",
+   "Mullaitivu",
+   "Puttalam",
+   "Vavuniya"
+  ],
+  "Matale": [
+   "Ampara",
+   "Anuradhapura",
+   "Badulla",
+   "Kandy",
+   "Kurunegala",
+   "Polonnaruwa"
+  ],
+  "Matara": [
+   "Galle",
+   "Hambantota",
+   "Ratnapura"
+  ],
+  "Monaragala": [
+   "Ampara",
+   "Badulla",
+   "Hambantota",
+   "Ratnapura"
+  ],
+  "Mullaitivu": [
+   "Jaffna",
+   "Kilinochchi",
+   "Mannar",
+   "Trincomalee",
+   "Vavuniya"
+  ],
+  "Nuwara Eliya": [
+   "Badulla",
+   "Kandy",
+   "Kegalle",
+   "Ratnapura"
+  ],
+  "Polonnaruwa": [
+   "Ampara",
+   "Anuradhapura",
+   "Batticaloa",
+   "Matale",
+   "Trincomalee"
+  ],
+  "Puttalam": [
+   "Anuradhapura",
+   "Gampaha",
+   "Kurunegala",
+   "Mannar"
+  ],
+  "Ratnapura": [
+   "Badulla",
+   "Colombo",
+   "Galle",
+   "Hambantota",
+   "Kalutara",
+   "Kegalle",
+   "Matara",
+   "Monaragala",
+   "Nuwara Eliya"
+  ],
+  "Trincomalee": [
+   "Anuradhapura",
+   "Batticaloa",
+   "Mullaitivu",
+   "Polonnaruwa",
+   "Vavuniya"
+  ],
+  "Vavuniya": [
+   "Anuradhapura",
+   "Mannar",
+   "Mullaitivu",
+   "Trincomalee"
+  ]
+ },
+ "lags": {
+  "1": {
+   "test_months": 2218,
+   "alerts_k": 653,
+   "selected": [
+    "rain 3 months",
+    "national cases"
+   ],
+   "selection_steps": [
+    {
+     "features": [],
+     "logloss_2016_2017": 0.6291
+    },
+    {
+     "tried": {
+      "case trend": 0.6292,
+      "rain 3 months": 0.6104,
+      "heavy-rain days": 0.6304,
+      "neighbour cases": 0.6307,
+      "national cases": 0.6134
+     }
+    },
+    {
+     "features": [
+      "rain 3 months"
+     ],
+     "logloss_2016_2017": 0.6104
+    },
+    {
+     "tried": {
+      "case trend": 0.6108,
+      "heavy-rain days": 0.6106,
+      "neighbour cases": 0.6185,
+      "national cases": 0.608
+     }
+    },
+    {
+     "features": [
+      "rain 3 months",
+      "national cases"
+     ],
+     "logloss_2016_2017": 0.608
+    },
+    {
+     "tried": {
+      "case trend": 0.6082,
+      "heavy-rain days": 0.6079,
+      "neighbour cases": 0.6173
+     }
+    }
+   ],
+   "current": {
+    "features": [],
+    "method": "raw",
+    "auc": 0.701,
+    "brier": 0.2192,
+    "brier_base_rate": 0.2506,
+    "passed": true,
+    "precision_at_k": 0.724,
+    "weights": {
+     "bias": -0.506,
+     "rain anomaly": -0.0,
+     "rain signal": 0.657,
+     "case anomaly": 1.277,
+     "case signal": 0.258,
+     "case missing": 0.579,
+     "season sin": -0.007,
+     "season cos": 0.115
+    }
+   },
+   "new": {
+    "features": [
+     "rain 3 months",
+     "national cases"
+    ],
+    "method": "recalibrated",
+    "auc": 0.687,
+    "brier": 0.2235,
+    "brier_base_rate": 0.2506,
+    "passed": true,
+    "precision_at_k": 0.711,
+    "weights": {
+     "bias": -0.44,
+     "rain anomaly": -0.379,
+     "rain signal": 0.55,
+     "case anomaly": 1.034,
+     "case signal": 0.126,
+     "case missing": 0.717,
+     "season sin": 0.198,
+     "season cos": -0.157,
+     "rain 3 months": 1.655,
+     "national cases": 1.418
+    }
+   },
+   "promotion_rule": {
+    "passes_calibration": true,
+    "auc_up_0_01": false,
+    "brier_lower": false
+   },
+   "adopted": false
+  },
+  "2": {
+   "test_months": 2216,
+   "alerts_k": 645,
+   "selected": [
+    "national cases"
+   ],
+   "selection_steps": [
+    {
+     "features": [],
+     "logloss_2016_2017": 0.6538
+    },
+    {
+     "tried": {
+      "case trend": 0.6501,
+      "rain 3 months": 0.6361,
+      "heavy-rain days": 0.6519,
+      "neighbour cases": 0.6385,
+      "national cases": 0.6282
+     }
+    },
+    {
+     "features": [
+      "national cases"
+     ],
+     "logloss_2016_2017": 0.6282
+    },
+    {
+     "tried": {
+      "case trend": 0.627,
+      "rain 3 months": 0.6271,
+      "heavy-rain days": 0.6279,
+      "neighbour cases": 0.6299
+     }
+    }
+   ],
+   "current": {
+    "features": [],
+    "method": "recalibrated",
+    "auc": 0.598,
+    "brier": 0.2485,
+    "brier_base_rate": 0.2508,
+    "passed": false,
+    "precision_at_k": 0.647,
+    "weights": {
+     "bias": -0.426,
+     "rain anomaly": 0.754,
+     "rain signal": 0.647,
+     "case anomaly": 0.665,
+     "case signal": 0.317,
+     "case missing": -0.137,
+     "season sin": 0.322,
+     "season cos": 0.395
+    }
+   },
+   "new": {
+    "features": [
+     "national cases"
+    ],
+    "method": "recalibrated",
+    "auc": 0.591,
+    "brier": 0.2511,
+    "brier_base_rate": 0.2508,
+    "passed": false,
+    "precision_at_k": 0.648,
+    "weights": {
+     "bias": -0.472,
+     "rain anomaly": 0.568,
+     "rain signal": 0.63,
+     "case anomaly": 0.288,
+     "case signal": 0.311,
+     "case missing": 0.062,
+     "season sin": 0.132,
+     "season cos": 0.261,
+     "national cases": 2.076
+    }
+   },
+   "promotion_rule": {
+    "passes_calibration": false,
+    "auc_up_0_01": false,
+    "brier_lower": false
+   },
+   "adopted": false
+  }
+ }
+}

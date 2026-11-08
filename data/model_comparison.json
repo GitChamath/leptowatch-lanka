@@ -1,0 +1,121 @@
+{
+ "lags": {
+  "1": {
+   "lag": 1,
+   "train_months": 984,
+   "test_months": 2218,
+   "alerts_k": 653,
+   "base_rate_test": 0.53,
+   "rows": [
+    {
+     "method": "Base rate",
+     "what": "always say the 2011-2017 share",
+     "auc": 0.5,
+     "brier": 0.251,
+     "precision_at_k": null
+    },
+    {
+     "method": "Seasonal calendar",
+     "what": "how often this month was busy before",
+     "auc": 0.508,
+     "brier": 0.315,
+     "precision_at_k": 0.538
+    },
+    {
+     "method": "Last month's cases",
+     "what": "how far the latest count is above usual",
+     "auc": 0.699,
+     "brier": null,
+     "precision_at_k": 0.737
+    },
+    {
+     "method": "Rain alone",
+     "what": "how much wetter than usual",
+     "auc": 0.577,
+     "brier": null,
+     "precision_at_k": 0.577
+    },
+    {
+     "method": "The rule",
+     "what": "Warning, Watch, Normal",
+     "auc": 0.652,
+     "brier": null,
+     "precision_at_k": 0.712
+    },
+    {
+     "method": "Logistic regression",
+     "what": "the model behind the percentage",
+     "auc": 0.701,
+     "brier": 0.219,
+     "precision_at_k": 0.724
+    },
+    {
+     "method": "Gradient-boosted trees",
+     "what": "80 small trees, comparison only",
+     "auc": 0.696,
+     "brier": 0.221,
+     "precision_at_k": 0.726
+    }
+   ]
+  },
+  "2": {
+   "lag": 2,
+   "train_months": 984,
+   "test_months": 2216,
+   "alerts_k": 645,
+   "base_rate_test": 0.537,
+   "rows": [
+    {
+     "method": "Base rate",
+     "what": "always say the 2011-2017 share",
+     "auc": 0.5,
+     "brier": 0.251,
+     "precision_at_k": null
+    },
+    {
+     "method": "Seasonal calendar",
+     "what": "how often this month was busy before",
+     "auc": 0.502,
+     "brier": 0.313,
+     "precision_at_k": 0.538
+    },
+    {
+     "method": "Last month's cases",
+     "what": "how far the latest count is above usual",
+     "auc": 0.614,
+     "brier": null,
+     "precision_at_k": 0.634
+    },
+    {
+     "method": "Rain alone",
+     "what": "how much wetter than usual",
+     "auc": 0.557,
+     "brier": null,
+     "precision_at_k": 0.581
+    },
+    {
+     "method": "The rule",
+     "what": "Warning, Watch, Normal",
+     "auc": 0.598,
+     "brier": null,
+     "precision_at_k": 0.654
+    },
+    {
+     "method": "Logistic regression",
+     "what": "the model behind the percentage",
+     "auc": 0.604,
+     "brier": 0.248,
+     "precision_at_k": 0.662
+    },
+    {
+     "method": "Gradient-boosted trees",
+     "what": "80 small trees, comparison only",
+     "auc": 0.615,
+     "brier": 0.248,
+     "precision_at_k": 0.66
+    }
+   ]
+  }
+ },
+ "note": "Trained on 2011-2017 targets, scored once on 2018 onwards. Precision is over the same number of alerts as the rule's Warnings."
+}

@@ -1,0 +1,45 @@
+name: Weekly data update
+
+on:
+  schedule:
+    - cron: "0 3 * * 0"     # 03:00 UTC every Sunday: the weekly outlook is decided on Saturdays; new CHIRPS months
+                            # and case reports are picked up within a week of being published
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m unittest discover -s tests
+      - name: Rebuild database from the committed snapshot
+        run: python scripts/seed.py
+      - name: Fetch new rainfall and case reports (failures are logged, last good data kept)
+        run: python scripts/update.py
+      - name: Fetch Open-Meteo rain up to today and the 16-day forecast (weekly outlook)
+        run: python -c "from lw import openmeteo; openmeteo.collect()"
+      - run: python scripts/export_seed.py
+      - name: Compare methods and baselines (trained on 2011-2017, scored on 2018+)
+        run: python scripts/compare_models.py
+      - name: Re-run the pre-registered extra-signals test
+        run: python research/signal_test.py
+      - run: python research/accuracy_v2.py
+      - name: Re-run the weekly accuracy round 2 comparison
+        run: python research/weekly_v2.py
+      - run: python scripts/build_state.py
+      - name: Rebuild the weekly outlook (back-test and live)
+        run: python scripts/build_weekly.py
+      - name: Commit refreshed data
+        run: |
+          git config user.name "leptowatch-bot"
+          git config user.email "leptowatch-bot@users.noreply.github.com"
+          git add data/seed data/state.json data/districts.geojson data/model_comparison.json data/baseline_comparison.json data/signal_test.json data/accuracy_v2.json data/weekly_v2.json data/weekly_state.json
+          git diff --cached --quiet || git commit -m "Data update $(date -u +%Y-%m-%d)"
+          git push

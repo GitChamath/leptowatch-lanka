@@ -1,0 +1,148 @@
+{
+ "preregistration": "research/PREREG_accuracy_v2.md",
+ "caveat": "2018 onwards was used before; this is a second look, not a fresh test.",
+ "lags": {
+  "1": {
+   "selected": [
+    "cases x Maha"
+   ],
+   "selection_steps": [
+    {
+     "features": [],
+     "mean_logloss": 0.6296
+    },
+    {
+     "tried": {
+      "district start": 0.6508,
+      "rain x Maha": 0.6281,
+      "cases x Maha": 0.6275
+     }
+    },
+    {
+     "features": [
+      "cases x Maha"
+     ],
+     "mean_logloss": 0.6275
+    },
+    {
+     "tried": {
+      "district start": 0.648,
+      "rain x Maha": 0.6264
+     }
+    }
+   ],
+   "alerts_k": 653,
+   "test_months": 2218,
+   "versions": {
+    "frozen, current features": {
+     "auc": 0.701,
+     "brier": 0.2192,
+     "brier_base_rate": 0.2506,
+     "passed": true,
+     "precision_at_k": 0.724,
+     "ece": 0.02,
+     "clears_bar": false
+    },
+    "yearly, current features": {
+     "auc": 0.697,
+     "brier": 0.2201,
+     "brier_base_rate": 0.2506,
+     "passed": false,
+     "precision_at_k": 0.714,
+     "ece": 0.019,
+     "clears_bar": false
+    },
+    "frozen, selected features": {
+     "auc": 0.7,
+     "brier": 0.2195,
+     "brier_base_rate": 0.2506,
+     "passed": true,
+     "precision_at_k": 0.721,
+     "ece": 0.025,
+     "clears_bar": false
+    },
+    "yearly, selected features": {
+     "auc": 0.697,
+     "brier": 0.2202,
+     "brier_base_rate": 0.2506,
+     "passed": false,
+     "precision_at_k": 0.714,
+     "ece": 0.021,
+     "clears_bar": false
+    }
+   },
+   "adopted": null
+  },
+  "2": {
+   "selected": [
+    "rain x Maha"
+   ],
+   "selection_steps": [
+    {
+     "features": [],
+     "mean_logloss": 0.6586
+    },
+    {
+     "tried": {
+      "district start": 0.6893,
+      "rain x Maha": 0.6496,
+      "cases x Maha": 0.6571
+     }
+    },
+    {
+     "features": [
+      "rain x Maha"
+     ],
+     "mean_logloss": 0.6496
+    },
+    {
+     "tried": {
+      "district start": 0.6802,
+      "cases x Maha": 0.6483
+     }
+    }
+   ],
+   "alerts_k": 645,
+   "test_months": 2216,
+   "versions": {
+    "frozen, current features": {
+     "auc": 0.604,
+     "brier": 0.2476,
+     "brier_base_rate": 0.2508,
+     "passed": false,
+     "precision_at_k": 0.662,
+     "ece": 0.086,
+     "clears_bar": false
+    },
+    "yearly, current features": {
+     "auc": 0.598,
+     "brier": 0.2439,
+     "brier_base_rate": 0.2508,
+     "passed": false,
+     "precision_at_k": 0.634,
+     "ece": 0.042,
+     "clears_bar": false
+    },
+    "frozen, selected features": {
+     "auc": 0.606,
+     "brier": 0.2473,
+     "brier_base_rate": 0.2508,
+     "passed": false,
+     "precision_at_k": 0.65,
+     "ece": 0.079,
+     "clears_bar": false
+    },
+    "yearly, selected features": {
+     "auc": 0.602,
+     "brier": 0.2439,
+     "brier_base_rate": 0.2508,
+     "passed": false,
+     "precision_at_k": 0.628,
+     "ece": 0.047,
+     "clears_bar": false
+    }
+   },
+   "adopted": null
+  }
+ }
+}
