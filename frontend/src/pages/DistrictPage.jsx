@@ -4,7 +4,7 @@ import { Chart, Delta, Kpi, Loading, Rich, Segmented, Status } from "../componen
 import { CountEntry, Check, Messages, TrackRecord } from "../components/district.jsx";
 import { dname, province, t } from "../i18n.js";
 import WeeklyCard from "../components/weekly.jsx";
-import { ACTIONS, LEVEL, LEVEL_MEANING, PROVINCE, WHY, casesForWarning, fmt, mon, whenLabel, whyText } from "../lib.js";
+import { ACTIONS, LEVEL, LEVEL_MEANING, PROVINCE, WHY, casesForWarning, fmt, mon, shownLevel, whenLabel, whyText } from "../lib.js";
 
 /** Everything about one district, laid out as a report: the answer first, then the evidence. */
 export default function DistrictPage({ name, summary, lag, onLag, getDistrict, onSaveCount, weekly, view, onView, onSaveWeekly }) {
@@ -48,7 +48,7 @@ export default function DistrictPage({ name, summary, lag, onLag, getDistrict, o
         <div className="report weekly-wrap">
           <WeeklyCard name={name} w={wk} lead={wlead} onLead={(l) => onView(`w${l}`)}
             model={weekly.ml} evaluation={weekly.evaluation} onSave={onSaveWeekly} />
-          {["warning", "watch"].includes(wk[wlead]?.level) && (
+          {["warning", "watch"].includes(shownLevel(wk[wlead])) && (
             <section className="card span-2"><Messages district={name} c={wk[wlead]} /></section>
           )}
         </div>

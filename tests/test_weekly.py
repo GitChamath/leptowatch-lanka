@@ -73,6 +73,32 @@ class Engine(unittest.TestCase):
         for k in ("level", "rain_signal", "case_signal", "cases_data_month", "cases_normal"):
             self.assertEqual(before[k], after[k])
 
+    def test_public_delay_ignores_reports_not_yet_online(self):
+        w, delay = D(2020, 6, 6), weekly.PUBLIC_DELAY
+        d = self.district()
+        before = d.assess(w, 1, delay=delay)
+        self.assertLessEqual((w - D.fromisoformat(before["cases_to"])).days, delay + 7)
+        d.cases.years[2020] = [p if p[0] <= w - dt.timedelta(delay) else (p[0], p[1] * 3) for p in d.cases.years[2020]]
+        d.cases._dates = {y: [x for x, _ in p] for y, p in d.cases.years.items()}
+        d._level, d._ratio = {}, {}
+        after = d.assess(w, 1, delay=delay)
+        for k in ("level", "case_signal", "cases_data_month", "cases_to"):
+            self.assertEqual(before[k], after[k])
+
+    def test_live_uses_recent_public_report_and_officer_count_wins(self):
+        d = self.district()
+        d.cases.years[2020] = [p for p in d.cases.years[2020] if p[0] <= D(2020, 5, 1)]   # last report 5 weeks old
+        d.cases._dates = {y: [x for x, _ in p] for y, p in d.cases.years.items()}
+        w = D(2020, 6, 6)
+        public = weekly.live_assess(d, w, 1, {})
+        self.assertFalse(public["officer"])
+        self.assertIsNotNone(public["cases_data_month"])
+        self.assertLess(D.fromisoformat(public["cases_to"]), w)
+        own = weekly.live_assess(d, w, 1, {w: 500})
+        self.assertTrue(own["officer"])
+        self.assertEqual((own["cases_data_month"], own["cases_to"]), (500, w.isoformat()))
+        self.assertEqual(own["level"], "watch")                          # cases far above normal, rain usual
+
 
 if __name__ == "__main__":
     unittest.main()

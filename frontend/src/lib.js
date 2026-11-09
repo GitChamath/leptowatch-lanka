@@ -17,20 +17,26 @@ export function whenLabel(m) {
 }
 
 export const LEVEL = byLang({
-  en: { warning: "Warning", watch: "Watch", normal: "Normal", nodata: "No data" },
-  si: { warning: "අනතුරු ඇඟවීම", watch: "සුපරීක්ෂාව", normal: "සාමාන්‍ය", nodata: "දත්ත නැත" },
-  ta: { warning: "எச்சரிக்கை", watch: "கண்காணிப்பு", normal: "இயல்பு", nodata: "தரவு இல்லை" },
+  en: { warning: "Warning", watch: "Watch", normal: "Normal", nodata: "No data", needcount: "Needs case count" },
+  si: { warning: "අනතුරු ඇඟවීම", watch: "සුපරීක්ෂාව", normal: "සාමාන්‍ය", nodata: "දත්ත නැත", needcount: "රෝගී සංඛ්‍යාව අවශ්‍යයි" },
+  ta: { warning: "எச்சரிக்கை", watch: "கண்காணிப்பு", normal: "இயல்பு", nodata: "தரவு இல்லை", needcount: "நோயாளர் எண்ணிக்கை தேவை" },
 });
 export const LEVEL_MEANING = byLang({
-  en: { warning: "Priority follow-up needed", watch: "Monitor conditions closely", normal: "No signal above the threshold", nodata: "Not enough data to assess" },
-  si: { warning: "ප්‍රමුඛ පසු විපරම් අවශ්‍යයි", watch: "තත්ත්වය සමීපව නිරීක්ෂණය කරන්න", normal: "සීමාවට වඩා සංඥාවක් නැත", nodata: "තක්සේරු කිරීමට ප්‍රමාණවත් දත්ත නැත" },
-  ta: { warning: "முன்னுரிமைப் பின்தொடர்தல் தேவை", watch: "நிலைமையை உன்னிப்பாகக் கண்காணியுங்கள்", normal: "வரம்புக்கு மேல் சமிக்ஞை இல்லை", nodata: "மதிப்பிடப் போதுமான தரவு இல்லை" },
+  en: { warning: "Priority follow-up needed", watch: "Monitor conditions closely", normal: "No signal above the threshold", nodata: "Not enough data to assess", needcount: "Wetter than usual; add the last 4 weeks' cases to decide" },
+  si: { warning: "ප්‍රමුඛ පසු විපරම් අවශ්‍යයි", watch: "තත්ත්වය සමීපව නිරීක්ෂණය කරන්න", normal: "සීමාවට වඩා සංඥාවක් නැත", nodata: "තක්සේරු කිරීමට ප්‍රමාණවත් දත්ත නැත", needcount: "සුපුරුදු ප්‍රමාණයට වඩා තෙත්; තීරණය කිරීමට පසුගිය සති 4 රෝගී සංඛ්‍යාව ඇතුළත් කරන්න" },
+  ta: { warning: "முன்னுரிமைப் பின்தொடர்தல் தேவை", watch: "நிலைமையை உன்னிப்பாகக் கண்காணியுங்கள்", normal: "வரம்புக்கு மேல் சமிக்ஞை இல்லை", nodata: "மதிப்பிடப் போதுமான தரவு இல்லை", needcount: "வழக்கத்தை விட ஈரமானது; தீர்மானிக்கக் கடந்த 4 வார நோயாளர் எண்ணிக்கையைச் சேர்க்கவும்" },
 });
 export const LEVELS = ["warning", "watch", "normal"];
-const COLOR_VAR = { warning: "--warning", watch: "--watch", watch_rain: "--watch-rain", normal: "--normal", nodata: "--nodata" };
+const COLOR_VAR = { warning: "--warning", watch: "--watch", watch_rain: "--watch-rain", needcount: "--needcount", normal: "--normal", nodata: "--nodata" };
+/** Weekly map categories, in order: a Watch with no case count yet is shown on its own (see shownLevel). */
+export const SHOWN = ["warning", "watch", "needcount", "normal"];
 
-/** A Watch that rests on rain alone: rain is up and no rise in cases is known. Shown paler on the map. */
-export const rainOnly = (c) => !!c && c.level === "watch" && !!c.rain_signal && c.case_signal !== true;
+/** What the weekly map shows. A Watch with no case count at all is "needs case count": in the back-test, rain alone
+ * was right only about as often as chance, so it should not look like a Watch until cases are known. */
+export const shownLevel = (c) => (!c ? "nodata" : c.level === "watch" && c.case_signal == null ? "needcount" : c.level);
+
+/** A Watch on rain alone where the case count is known and not above usual. Shown paler on the map. */
+export const rainOnly = (c) => !!c && c.level === "watch" && !!c.rain_signal && c.case_signal === false;
 
 export const WHY = new Proxy({}, { get: (_, k) => t(`why_${String(k)}`) });
 
@@ -46,6 +52,15 @@ export function whyText(c) {
     return t("why_cases_not_rain");
   }
   return caseKnown ? WHY.normal : t("why_normal_nocase");
+}
+
+/** The "based on" line for a weekly record: an up-to-date count, the latest (late) public report, or rain only. */
+export function weeklyBasis(c) {
+  if (c.case_signal == null) return t("wk_basis_rain", { date: fmtDay(c.decided) });
+  if (!c.officer && c.cases_to && c.cases_to !== c.decided) {
+    return t("wk_basis_public", { date: fmtDay(c.decided), cases: fmtDay(c.cases_to) });
+  }
+  return t("wk_basis", { date: fmtDay(c.decided) });
 }
 
 /** For a rain-only Watch: the smallest case count that would turn it into a Warning (cases must exceed the usual). */

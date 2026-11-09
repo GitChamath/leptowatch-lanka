@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from lw import config, weekly  # noqa: E402
+from lw import config, engine, weekly  # noqa: E402
 
 STATE = config.DATA / "weekly_state.json"
 
@@ -26,6 +26,15 @@ def main():
         ev = weekly.evaluate(recs)
         model = {lead: e["model"] for lead, e in ev.items()}
         evaluation = {lead: {"dev": e["dev"], "heldout": e["heldout"]} for lead, e in ev.items()}
+        # the same rule when the officer enters nothing: public reports only, as late as they really appear online
+        pub = weekly.history(cons, delay=weekly.PUBLIC_DELAY)
+        for lead in evaluation:
+            rs = [r for r in pub if str(r["lag"]) == lead]
+            evaluation[lead]["heldout_public"] = engine.score([r for r in rs if r["target"] >= config.HELDOUT_FROM])
+            evaluation[lead]["dev_public"] = engine.score([r for r in rs if r["target"] < config.HELDOUT_FROM])
+            p = evaluation[lead]["heldout_public"]["warning"]
+            print(f"lead {lead} held-out, public reports only ({weekly.PUBLIC_DELAY} days late): Warning "
+                  f"{p['precision']:.0%} ({p['correct']}/{p['alerts']})")
         for lead, e in ev.items():
             h, m = e["heldout"], e["model"]
             if h:

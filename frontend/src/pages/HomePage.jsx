@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Icon } from "../icons.jsx";
 import { t, useLang } from "../i18n.js";
-import { LEVEL, LEVELS, fmt, fmtDay, levelColor, whenLabel } from "../lib.js";
+import { LEVEL, LEVELS, SHOWN, fmt, fmtDay, levelColor, shownLevel, whenLabel } from "../lib.js";
 
 /** First screen: what LeptoWatch is, how to read it and how to use it, before the map. */
 const TEXT = {
@@ -20,7 +20,8 @@ const TEXT = {
     colours: "What the colours mean",
     level: {
       normal: "Neither signal is up. Continue routine prevention.",
-      watch: "One signal is up, usually rain. Check the case count for the last 4 weeks.",
+      needcount: "Wetter than usual, but no case count yet for the last 4 weeks. Add it to get a Watch, Warning or Normal.",
+      watch: "Rain or cases are up, but not enough for a Warning. Monitor closely.",
       warning: "Rain is up and cases are well above usual. Start preventive outreach and alert hospitals.",
     },
     use: "How to use it",
@@ -34,7 +35,7 @@ const TEXT = {
     knows: [
       "It is for planning prevention across a district. It does not diagnose patients or give treatment advice.",
       "A coloured district means higher risk than usual, not a confirmed outbreak.",
-      "On years the system never learned from, Warnings for the next 4 weeks were right {w}% of the time, against {b}% by chance.",
+      "On years the system never learned from, Warnings for the next 4 weeks were right {w}% of the time with an up-to-date case count, and {q}% using public reports alone (they go online about 8 weeks late), against {b}% by chance.",
       "Switch between English, Sinhala and Tamil at the top of every page.",
     ],
   },
@@ -53,7 +54,8 @@ const TEXT = {
     colours: "වර්ණවලින් අදහස් වන්නේ",
     level: {
       normal: "කිසිදු සංඥාවක් ඉහළ නැත. සුපුරුදු වැළැක්වීමේ කටයුතු කරගෙන යන්න.",
-      watch: "එක් සංඥාවක් ඉහළයි, බොහෝ විට වැසි. පසුගිය සති 4 තුළ රෝගී සංඛ්‍යාව පරීක්ෂා කරන්න.",
+      needcount: "සුපුරුදු ප්‍රමාණයට වඩා තෙත්, නමුත් පසුගිය සති 4 සඳහා රෝගී සංඛ්‍යාවක් තවම නැත. සුපරීක්ෂාව, අනතුරු ඇඟවීම හෝ සාමාන්‍ය ලබා ගැනීමට එය ඇතුළත් කරන්න.",
+      watch: "වැසි හෝ රෝගීන් ඉහළයි, නමුත් අනතුරු ඇඟවීමකට ප්‍රමාණවත් නැත. සමීපව නිරීක්ෂණය කරන්න.",
       warning: "වැසි ඉහළයි, රෝගීන් සුපුරුදු ප්‍රමාණයට වඩා බොහෝ වැඩියි. වැළැක්වීමේ දැනුවත් කිරීම් අරඹා රෝහල් දැනුවත් කරන්න.",
     },
     use: "භාවිතා කරන ආකාරය",
@@ -67,7 +69,7 @@ const TEXT = {
     knows: [
       "මෙය දිස්ත්‍රික්කයක් පුරා වැළැක්වීම සැලසුම් කිරීම සඳහා ය. එය රෝගීන් හඳුනා ගැනීම හෝ ප්‍රතිකාර උපදෙස් ලබා දීම නොකරයි.",
       "වර්ණ ගැන්වූ දිස්ත්‍රික්කයක් යනු සුපුරුදු ප්‍රමාණයට වඩා වැඩි අවදානමකි, තහවුරු වූ වසංගතයක් නොවේ.",
-      "පද්ධතිය ඉගෙන නොගත් වසරවලදී, ඉදිරි සති 4 සඳහා අනතුරු ඇඟවීම් {w}% ක් නිවැරදි විය; අහම්බෙන් එය {b}% කි.",
+      "පද්ධතිය ඉගෙන නොගත් වසරවලදී, ඉදිරි සති 4 සඳහා අනතුරු ඇඟවීම් යාවත්කාලීන රෝගී සංඛ්‍යාවක් සමඟ {w}% ක් ද, පොදු වාර්තා පමණක් සමඟ (ඒවා සති 8 කට පමණ පසු අන්තර්ජාලයට එයි) {q}% ක් ද නිවැරදි විය; අහම්බෙන් එය {b}% කි.",
       "සෑම පිටුවකම ඉහළින් ඉංග්‍රීසි, සිංහල සහ දෙමළ අතර මාරු වන්න.",
     ],
   },
@@ -86,7 +88,8 @@ const TEXT = {
     colours: "நிறங்களின் அர்த்தம்",
     level: {
       normal: "எந்தச் சமிக்ஞையும் உயரவில்லை. வழக்கமான தடுப்பைத் தொடருங்கள்.",
-      watch: "ஒரு சமிக்ஞை உயர்ந்துள்ளது, பெரும்பாலும் மழை. கடந்த 4 வார நோயாளர் எண்ணிக்கையைச் சரிபாருங்கள்.",
+      needcount: "வழக்கத்தை விட ஈரமானது, ஆனால் கடந்த 4 வாரங்களுக்கான நோயாளர் எண்ணிக்கை இன்னும் இல்லை. கண்காணிப்பு, எச்சரிக்கை அல்லது இயல்பு பெற அதைச் சேர்க்கவும்.",
+      watch: "மழை அல்லது நோயாளர்கள் உயர்ந்துள்ளனர், ஆனால் எச்சரிக்கைக்குப் போதாது. உன்னிப்பாகக் கண்காணியுங்கள்.",
       warning: "மழை உயர்ந்துள்ளது, நோயாளர்கள் வழக்கத்தை விட மிக அதிகம். தடுப்பு விழிப்புணர்வைத் தொடங்கி மருத்துவமனைகளுக்குத் தெரிவியுங்கள்.",
     },
     use: "எப்படிப் பயன்படுத்துவது",
@@ -100,7 +103,7 @@ const TEXT = {
     knows: [
       "இது ஒரு மாவட்டம் முழுவதும் தடுப்பைத் திட்டமிடுவதற்கானது. இது நோயாளர்களைக் கண்டறிவதோ சிகிச்சை ஆலோசனை வழங்குவதோ இல்லை.",
       "நிறமிடப்பட்ட மாவட்டம் என்பது வழக்கத்தை விட அதிக ஆபத்து, உறுதிப்படுத்தப்பட்ட பரவல் அல்ல.",
-      "அமைப்பு கற்றுக்கொள்ளாத ஆண்டுகளில், அடுத்த 4 வாரங்களுக்கான எச்சரிக்கைகள் {w}% சரியாக இருந்தன; தற்செயலாக இது {b}%.",
+      "அமைப்பு கற்றுக்கொள்ளாத ஆண்டுகளில், அடுத்த 4 வாரங்களுக்கான எச்சரிக்கைகள் புதுப்பித்த நோயாளர் எண்ணிக்கையுடன் {w}% உம், பொது அறிக்கைகள் மட்டும் கொண்டு (அவை சுமார் 8 வாரங்கள் தாமதமாக இணையத்தில் வரும்) {q}% உம் சரியாக இருந்தன; தற்செயலாக இது {b}%.",
       "ஒவ்வொரு பக்கத்தின் மேலேயும் ஆங்கிலம், சிங்களம், தமிழ் இடையே மாறலாம்.",
     ],
   },
@@ -113,7 +116,8 @@ export default function HomePage({ summary, weekly }) {
   const T = TEXT[useLang()] || TEXT.en;
   const held = summary.pooled?.["1"]?.heldout;
   const wk = weekly?.evaluation?.["1"]?.heldout || held;
-  const nums = { w: pct(wk?.warning?.precision), b: pct(wk?.base_rate) };
+  const nums = { w: pct(wk?.warning?.precision), b: pct(wk?.base_rate),
+    q: pct(weekly?.evaluation?.["1"]?.heldout_public?.warning?.precision) };
   const tally = (lag) => {
     const out = { warning: 0, watch: 0, normal: 0 };
     Object.values(summary.districts).forEach((x) => {
@@ -142,14 +146,16 @@ export default function HomePage({ summary, weekly }) {
           <div className="eyebrow">{T.snap}</div>
           {weekly && ["1", "2"].map((lead) => {
             const first = Object.values(weekly.districts)[0]?.[lead];
-            const c = { warning: 0, watch: 0, normal: 0 };
-            Object.values(weekly.districts).forEach((x) => { const l = x[lead]?.level; if (l in c) c[l]++; });
+            const c = { warning: 0, watch: 0, needcount: 0, normal: 0 };
+            Object.values(weekly.districts).forEach((x) => { const l = shownLevel(x[lead]); if (l in c) c[l]++; });
             return (
               <a key={lead} className="snap-row" href="#/map">
                 <span className="snap-when"><b>{lead === "1" ? t("wk_next") : t("wk_after")}</b>
                   <span>{first ? t("wk_range", { from: fmtDay(first.target_from), to: fmtDay(first.target_end) }) : ""}</span></span>
                 <span className="snap-counts">
-                  {LEVELS.map((l) => <span key={l} title={LEVEL[l]}><i className="key" style={{ background: levelColor(l) }} />{c[l]}</span>)}
+                  {SHOWN.filter((l) => l !== "needcount" || c[l] > 0).map((l) => (
+                    <span key={l} title={LEVEL[l]}><i className="key" style={{ background: levelColor(l) }} />{c[l]}</span>
+                  ))}
                 </span>
               </a>
             );
@@ -189,7 +195,7 @@ export default function HomePage({ summary, weekly }) {
       <motion.section className="home-section rise">
         <h2>{T.colours}</h2>
         <div className="home-levels">
-          {["normal", "watch", "warning"].map((l) => (
+          {["normal", "needcount", "watch", "warning"].map((l) => (
             <div key={l} className={`home-level ${l}`}>
               <div className="home-level-name"><i className="key" style={{ background: levelColor(l) }} />{LEVEL[l]}</div>
               <p>{T.level[l]}</p>

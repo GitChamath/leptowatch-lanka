@@ -40,18 +40,20 @@ const TEXT = {
     alertStep: "The alert",
     level: {
       normal: "Neither is up. Continue routine prevention.",
+      needcount: "Wetter than usual, but no case count yet. Add the last 4 weeks' cases to get a Watch, Warning or Normal.",
       watch: "Rain or cases is up, but not enough for a Warning. Check your latest case count.",
       warning: "Rain is up and cases are more than 1.4 times usual. Start preventive outreach and alert hospitals.",
     },
     leads: ["Next 4 weeks and weeks 5–8", "Both use the same numbers from the last few weeks. Weeks 5–8 looks further ahead, so it gives more time to prepare but is less certain."],
     reliable: "How often is it right?",
     rows: [
-      ["{w} of 100", "Warnings for the next 4 weeks were followed by more cases than usual."],
-      ["{w2} of 100", "Warnings for weeks 5–8 were followed by more cases than usual."],
+      ["{w} of 100", "Warnings for the next 4 weeks were followed by more cases than usual, when the officer entered an up-to-date case count."],
+      ["{w2} of 100", "Warnings for weeks 5–8 were followed by more cases than usual, with an up-to-date case count."],
+      ["{q} and {q2} of 100", "The same two, using public reports alone. They go online about 8 weeks after the week they cover, so the case count is older."],
       ["{b} of 100", "4-week periods have more cases than usual anyway, with no forecast at all."],
     ],
-    tested: "We set the rules using 2011 to 2017 only, then tested them on {from} to {to}, treating each Saturday as if it were today.",
-    example: {"title": "A real example: Jaffna, 2024", "text": "In December 2024 a leptospirosis outbreak in Jaffna caused several deaths after heavy rain and floods. We replayed LeptoWatch using only the data that existed on each date:", "rows": [["2 Nov", "Warning: 39 rainy days in 8 weeks (usual 33), 5 cases in 4 weeks (usual 1)"], ["2 – 30 Nov", "Warning every week"], ["Mid-December", "Outbreak recognised; deaths reported from 11 December"], ["4 weeks to 28 Dec", "218 cases, against about 5 in a usual year"]], "note": "So the Warning came about six weeks before cases peaked. This is a replay of past data, not a forecast anyone saw at the time, and it assumes the officer entered the case counts."},
+    tested: "We set the rules using 2011 to 2017 only, then tested them on {from} to {to}, treating each Saturday as if it were today. For the public-report figures, each Saturday only uses reports that would already have been online.",
+    example: {"title": "A real example: Jaffna, 2024", "text": "In December 2024 a leptospirosis outbreak in Jaffna caused several deaths after heavy rain and floods. We replayed LeptoWatch using only the data that existed on each date:", "rows": [["2 Nov", "Warning: 39 rainy days in 8 weeks (usual 33), 5 cases in 4 weeks (usual 1)"], ["2 – 30 Nov", "Warning every week"], ["Public reports only", "Watch through November; first Warning on 7 Dec, four days before deaths were reported"], ["Mid-December", "Outbreak recognised; deaths reported from 11 December"], ["4 weeks to 28 Dec", "218 cases, against about 5 in a usual year"]], "note": "So the Warning came about six weeks before cases peaked. This is a replay of past data, not a forecast anyone saw at the time, and the weekly Warnings in November assume the officer entered the case counts. With public reports alone, which go online about 8 weeks late, it stayed on Watch until 7 December, so the early warning depends on the officer's own counts."},
     mind: "Keep in mind",
     minds: [
       "Public case reports come 8 to 11 weeks late. Add the cases notified in the last 4 weeks, so a Warning is possible.",
@@ -99,18 +101,20 @@ const TEXT = {
     alertStep: "අනතුරු ඇඟවීම",
     level: {
       normal: "කිසිවක් ඉහළ නැත. සුපුරුදු වැළැක්වීමේ කටයුතු කරගෙන යන්න.",
+      needcount: "සුපුරුදු ප්‍රමාණයට වඩා තෙත්, නමුත් තවම රෝගී සංඛ්‍යාවක් නැත. සුපරීක්ෂාව, අනතුරු ඇඟවීම හෝ සාමාන්‍ය ලබා ගැනීමට පසුගිය සති 4 රෝගීන් ඇතුළත් කරන්න.",
       watch: "වැසි හෝ රෝගීන් ඉහළයි, නමුත් අනතුරු ඇඟවීමකට ප්‍රමාණවත් නැත. ඔබේ නවතම රෝගී සංඛ්‍යාව පරීක්ෂා කරන්න.",
       warning: "වැසි ඉහළයි, රෝගීන් සුපුරුදු ප්‍රමාණය මෙන් 1.4 ගුණයකට වඩා වැඩියි. වැළැක්වීමේ දැනුවත් කිරීම් අරඹා රෝහල් දැනුවත් කරන්න.",
     },
     leads: ["ඉදිරි සති 4 සහ සති 5–8", "දෙකම පසුගිය සති කිහිපයේ එකම අංක භාවිතා කරයි. සති 5–8 තවත් ඉදිරියට බලයි, එබැවින් සූදානම් වීමට වැඩි කාලයක් ලැබෙන නමුත් නිශ්චිතභාවය අඩුය."],
     reliable: "එය කොපමණ වාරයක් නිවැරදිද?",
     rows: [
-      ["100 න් {w}", "ඉදිරි සති 4 සඳහා වූ අනතුරු ඇඟවීම්වලින් පසු සුපුරුදු ප්‍රමාණයට වඩා රෝගීන් සිටියහ."],
-      ["100 න් {w2}", "සති 5–8 සඳහා වූ අනතුරු ඇඟවීම්වලින් පසු සුපුරුදු ප්‍රමාණයට වඩා රෝගීන් සිටියහ."],
+      ["100 න් {w}", "නිලධාරියා යාවත්කාලීන රෝගී සංඛ්‍යාවක් ඇතුළත් කළ විට, ඉදිරි සති 4 සඳහා වූ අනතුරු ඇඟවීම්වලින් පසු සුපුරුදු ප්‍රමාණයට වඩා රෝගීන් සිටියහ."],
+      ["100 න් {w2}", "යාවත්කාලීන රෝගී සංඛ්‍යාවක් සමඟ, සති 5–8 සඳහා වූ අනතුරු ඇඟවීම්වලින් පසු සුපුරුදු ප්‍රමාණයට වඩා රෝගීන් සිටියහ."],
+      ["100 න් {q} සහ {q2}", "පොදු වාර්තා පමණක් භාවිතා කළ විට එම අගයන් දෙක. ඒවා අදාළ සතියෙන් සති 8 කට පමණ පසු අන්තර්ජාලයට එන බැවින් රෝගී සංඛ්‍යාව පැරණිය."],
       ["100 න් {b}", "පුරෝකථනයක් නැතිව වුවද සති 4 කාලපරිච්ඡේදවල සුපුරුදු ප්‍රමාණයට වඩා රෝගීන් සිටියි."],
     ],
-    tested: "අපි නීති සකස් කළේ 2011 සිට 2017 දක්වා දත්ත පමණක් භාවිතයෙන්. පසුව සෑම සෙනසුරාදාවක්ම අද දිනය ලෙස සලකා ඒවා {from} සිට {to} දක්වා පරීක්ෂා කළෙමු.",
-    example: {"title": "සැබෑ උදාහරණයක්: යාපනය, 2024", "text": "2024 දෙසැම්බරයේ අධික වැසි සහ ගංවතුරෙන් පසු යාපනයේ ඇති වූ මී උණ පැතිරීමෙන් කිහිප දෙනෙක් මිය ගියහ. එක් එක් දිනයේ තිබූ දත්ත පමණක් භාවිතා කර අපි LeptoWatch නැවත ධාවනය කළෙමු:", "rows": [["නොවැ. 2", "අනතුරු ඇඟවීම: සති 8 තුළ වැසි දින 39 (සුපුරුදු 33), සති 4 තුළ රෝගීන් 5 (සුපුරුදු 1)"], ["නොවැ. 2 – 30", "සෑම සතියකම අනතුරු ඇඟවීම"], ["දෙසැම්බර් මැද", "පැතිරීම හඳුනා ගැනිණි; දෙසැ. 11 සිට මරණ වාර්තා විය"], ["දෙසැ. 28 දක්වා සති 4", "රෝගීන් 218, සුපුරුදු වසරක 5 ක් පමණ"]], "note": "එනම් රෝගීන් උපරිමයට පැමිණීමට සති හයකට පමණ පෙර අනතුරු ඇඟවීම ලැබුණි. මෙය අතීත දත්ත නැවත ධාවනය කිරීමකි, එකල කිසිවෙකු දුටු පුරෝකථනයක් නොවේ; නිලධාරියා රෝගී සංඛ්‍යා ඇතුළත් කළ බව එය උපකල්පනය කරයි."},
+    tested: "අපි නීති සකස් කළේ 2011 සිට 2017 දක්වා දත්ත පමණක් භාවිතයෙන්. පසුව සෑම සෙනසුරාදාවක්ම අද දිනය ලෙස සලකා ඒවා {from} සිට {to} දක්වා පරීක්ෂා කළෙමු. පොදු වාර්තා අගයන් සඳහා, සෑම සෙනසුරාදාවකම එදිනට අන්තර්ජාලයේ තිබූ වාර්තා පමණක් භාවිතා විය.",
+    example: {"title": "සැබෑ උදාහරණයක්: යාපනය, 2024", "text": "2024 දෙසැම්බරයේ අධික වැසි සහ ගංවතුරෙන් පසු යාපනයේ ඇති වූ මී උණ පැතිරීමෙන් කිහිප දෙනෙක් මිය ගියහ. එක් එක් දිනයේ තිබූ දත්ත පමණක් භාවිතා කර අපි LeptoWatch නැවත ධාවනය කළෙමු:", "rows": [["නොවැ. 2", "අනතුරු ඇඟවීම: සති 8 තුළ වැසි දින 39 (සුපුරුදු 33), සති 4 තුළ රෝගීන් 5 (සුපුරුදු 1)"], ["නොවැ. 2 – 30", "සෑම සතියකම අනතුරු ඇඟවීම"], ["පොදු වාර්තා පමණක්", "නොවැම්බර් පුරා සුපරීක්ෂාව; පළමු අනතුරු ඇඟවීම දෙසැ. 7, මරණ වාර්තා වීමට දින හතරකට පෙර"], ["දෙසැම්බර් මැද", "පැතිරීම හඳුනා ගැනිණි; දෙසැ. 11 සිට මරණ වාර්තා විය"], ["දෙසැ. 28 දක්වා සති 4", "රෝගීන් 218, සුපුරුදු වසරක 5 ක් පමණ"]], "note": "එනම් රෝගීන් උපරිමයට පැමිණීමට සති හයකට පමණ පෙර අනතුරු ඇඟවීම ලැබුණි. මෙය අතීත දත්ත නැවත ධාවනය කිරීමකි, එකල කිසිවෙකු දුටු පුරෝකථනයක් නොවේ; නොවැම්බරයේ සතිපතා අනතුරු ඇඟවීම් නිලධාරියා රෝගී සංඛ්‍යා ඇතුළත් කළ බව උපකල්පනය කරයි. සති 8 කට පමණ පසු අන්තර්ජාලයට එන පොදු වාර්තා පමණක් සමඟ එය දෙසැ. 7 දක්වා සුපරීක්ෂාවේ පැවතුණි; එබැවින් කලින් අනතුරු ඇඟවීම නිලධාරියාගේම සංඛ්‍යා මත රඳා පවතී."},
     mind: "මතක තබා ගන්න",
     minds: [
       "ප්‍රසිද්ධ රෝගී වාර්තා සති 8 සිට 11 දක්වා ප්‍රමාද වේ. අනතුරු ඇඟවීමක් ලැබිය හැකි වන පරිදි පසුගිය සති 4 තුළ දැනුම් දුන් රෝගීන් ඇතුළත් කරන්න.",
@@ -158,18 +162,20 @@ const TEXT = {
     alertStep: "எச்சரிக்கை",
     level: {
       normal: "எதுவும் உயரவில்லை. வழக்கமான தடுப்பைத் தொடருங்கள்.",
+      needcount: "வழக்கத்தை விட ஈரமானது, ஆனால் இன்னும் நோயாளர் எண்ணிக்கை இல்லை. கண்காணிப்பு, எச்சரிக்கை அல்லது இயல்பு பெற கடந்த 4 வார நோயாளர்களைச் சேர்க்கவும்.",
       watch: "மழை அல்லது நோயாளர்கள் உயர்ந்துள்ளனர், ஆனால் எச்சரிக்கைக்குப் போதாது. உங்கள் சமீபத்திய நோயாளர் எண்ணிக்கையைச் சரிபாருங்கள்.",
       warning: "மழை உயர்ந்துள்ளது, நோயாளர்கள் வழக்கத்தின் 1.4 மடங்குக்கு மேல். தடுப்பு விழிப்புணர்வைத் தொடங்கி மருத்துவமனைகளுக்குத் தெரிவியுங்கள்.",
     },
     leads: ["அடுத்த 4 வாரங்களும் வாரங்கள் 5–8 உம்", "இரண்டும் கடந்த சில வாரங்களின் அதே எண்களைப் பயன்படுத்துகின்றன. வாரங்கள் 5–8 மேலும் முன்னோக்கிப் பார்க்கிறது, எனவே தயாராக அதிக நேரம் தருகிறது, ஆனால் உறுதி குறைவு."],
     reliable: "இது எத்தனை முறை சரியாக இருக்கிறது?",
     rows: [
-      ["100 இல் {w}", "அடுத்த 4 வாரங்களுக்கான எச்சரிக்கைகளுக்குப் பின் வழக்கத்தை விட அதிக நோயாளர்கள் இருந்தனர்."],
-      ["100 இல் {w2}", "வாரங்கள் 5–8 க்கான எச்சரிக்கைகளுக்குப் பின் வழக்கத்தை விட அதிக நோயாளர்கள் இருந்தனர்."],
+      ["100 இல் {w}", "அதிகாரி புதுப்பித்த நோயாளர் எண்ணிக்கையை உள்ளிட்டபோது, அடுத்த 4 வாரங்களுக்கான எச்சரிக்கைகளுக்குப் பின் வழக்கத்தை விட அதிக நோயாளர்கள் இருந்தனர்."],
+      ["100 இல் {w2}", "புதுப்பித்த நோயாளர் எண்ணிக்கையுடன், வாரங்கள் 5–8 க்கான எச்சரிக்கைகளுக்குப் பின் வழக்கத்தை விட அதிக நோயாளர்கள் இருந்தனர்."],
+      ["100 இல் {q} மற்றும் {q2}", "பொது அறிக்கைகளை மட்டும் கொண்டு அதே இரண்டும். அவை உரிய வாரத்துக்குச் சுமார் 8 வாரங்களுக்குப் பின் இணையத்தில் வருவதால் நோயாளர் எண்ணிக்கை பழையது."],
       ["100 இல் {b}", "முன்னறிவிப்பு இல்லாமலும் 4 வாரக் காலங்களில் வழக்கத்தை விட அதிக நோயாளர்கள் இருக்கின்றனர்."],
     ],
-    tested: "விதிகளை 2011 முதல் 2017 வரையான தரவை மட்டும் கொண்டு அமைத்தோம். பின்னர் ஒவ்வொரு சனிக்கிழமையையும் இன்று போலக் கருதி {from} முதல் {to} வரை சோதித்தோம்.",
-    example: {"title": "ஓர் உண்மை உதாரணம்: யாழ்ப்பாணம், 2024", "text": "2024 டிசம்பரில் கனமழை மற்றும் வெள்ளத்தின் பின் யாழ்ப்பாணத்தில் ஏற்பட்ட எலிக்காய்ச்சல் பரவலால் பலர் உயிரிழந்தனர். ஒவ்வொரு திகதியிலும் இருந்த தரவை மட்டும் கொண்டு LeptoWatch ஐ மீண்டும் இயக்கினோம்:", "rows": [["நவ. 2", "எச்சரிக்கை: 8 வாரங்களில் 39 மழை நாட்கள் (வழக்கம் 33), 4 வாரங்களில் 5 நோயாளர்கள் (வழக்கம் 1)"], ["நவ. 2 – 30", "ஒவ்வொரு வாரமும் எச்சரிக்கை"], ["டிசம்பர் நடுப்பகுதி", "பரவல் அடையாளம் காணப்பட்டது; டிச. 11 முதல் மரணங்கள் அறிவிக்கப்பட்டன"], ["டிச. 28 வரை 4 வாரங்கள்", "218 நோயாளர்கள், வழக்கமான ஆண்டில் சுமார் 5"]], "note": "அதாவது நோயாளர்கள் உச்சத்தை அடைவதற்குச் சுமார் ஆறு வாரங்களுக்கு முன்பே எச்சரிக்கை வந்தது. இது கடந்த தரவின் மீள் இயக்கம், அப்போது யாரும் பார்த்த முன்னறிவிப்பு அல்ல; அதிகாரி நோயாளர் எண்ணிக்கைகளை உள்ளிட்டதாக இது கருதுகிறது."},
+    tested: "விதிகளை 2011 முதல் 2017 வரையான தரவை மட்டும் கொண்டு அமைத்தோம். பின்னர் ஒவ்வொரு சனிக்கிழமையையும் இன்று போலக் கருதி {from} முதல் {to} வரை சோதித்தோம். பொது அறிக்கை எண்களுக்கு, ஒவ்வொரு சனிக்கிழமையும் அன்று ஏற்கனவே இணையத்தில் இருந்த அறிக்கைகள் மட்டுமே பயன்படுத்தப்பட்டன.",
+    example: {"title": "ஓர் உண்மை உதாரணம்: யாழ்ப்பாணம், 2024", "text": "2024 டிசம்பரில் கனமழை மற்றும் வெள்ளத்தின் பின் யாழ்ப்பாணத்தில் ஏற்பட்ட எலிக்காய்ச்சல் பரவலால் பலர் உயிரிழந்தனர். ஒவ்வொரு திகதியிலும் இருந்த தரவை மட்டும் கொண்டு LeptoWatch ஐ மீண்டும் இயக்கினோம்:", "rows": [["நவ. 2", "எச்சரிக்கை: 8 வாரங்களில் 39 மழை நாட்கள் (வழக்கம் 33), 4 வாரங்களில் 5 நோயாளர்கள் (வழக்கம் 1)"], ["நவ. 2 – 30", "ஒவ்வொரு வாரமும் எச்சரிக்கை"], ["பொது அறிக்கைகள் மட்டும்", "நவம்பர் முழுவதும் கண்காணிப்பு; முதல் எச்சரிக்கை டிச. 7, மரணங்கள் அறிவிக்கப்படுவதற்கு நான்கு நாட்களுக்கு முன்"], ["டிசம்பர் நடுப்பகுதி", "பரவல் அடையாளம் காணப்பட்டது; டிச. 11 முதல் மரணங்கள் அறிவிக்கப்பட்டன"], ["டிச. 28 வரை 4 வாரங்கள்", "218 நோயாளர்கள், வழக்கமான ஆண்டில் சுமார் 5"]], "note": "அதாவது நோயாளர்கள் உச்சத்தை அடைவதற்குச் சுமார் ஆறு வாரங்களுக்கு முன்பே எச்சரிக்கை வந்தது. இது கடந்த தரவின் மீள் இயக்கம், அப்போது யாரும் பார்த்த முன்னறிவிப்பு அல்ல; நவம்பர் மாத வாராந்த எச்சரிக்கைகள் அதிகாரி நோயாளர் எண்ணிக்கைகளை உள்ளிட்டதாகக் கருதுகின்றன. சுமார் 8 வாரங்கள் தாமதமாக இணையத்தில் வரும் பொது அறிக்கைகள் மட்டும் கொண்டு, அது டிச. 7 வரை கண்காணிப்பில் இருந்தது; எனவே முன்கூட்டிய எச்சரிக்கை அதிகாரியின் சொந்த எண்ணிக்கைகளைச் சார்ந்துள்ளது."},
     mind: "நினைவில் கொள்ளுங்கள்",
     minds: [
       "பொது நோயாளர் அறிக்கைகள் 8 முதல் 11 வாரங்கள் தாமதமாக வருகின்றன. எச்சரிக்கை சாத்தியமாக, கடந்த 4 வாரங்களில் அறிவிக்கப்பட்ட நோயாளர்களைச் சேருங்கள்.",
@@ -217,6 +223,7 @@ export default function AboutPage({ summary, weekly }) {
   const h2 = ev?.["2"]?.heldout || summary.pooled?.["2"]?.heldout;
   const v = {
     w: pct(h1?.warning?.precision), w2: pct(h2?.warning?.precision), b: pct(h1?.base_rate),
+    q: pct(ev?.["1"]?.heldout_public?.warning?.precision), q2: pct(ev?.["2"]?.heldout_public?.warning?.precision),
     from: "2018", to: (d.last_case_report || "").slice(0, 4),
     cases: fullDay(d.last_case_report), rain: fmt(d.last_rain_month), om: fullDay(weekly?.decided),
   };
@@ -238,7 +245,7 @@ export default function AboutPage({ summary, weekly }) {
       <section className="about-step">
         <h2><span className="home-num big">3</span><span className="home-step-icon"><Icon.bell /></span>{T.alertStep}</h2>
         <div className="home-levels">
-          {["warning", "watch", "normal"].map((l) => (
+          {["warning", "watch", "needcount", "normal"].map((l) => (
             <div key={l} className={`home-level ${l}`}>
               <div className="home-level-name"><i className="key" style={{ background: levelColor(l) }} />{LEVEL[l]}</div>
               <p>{T.level[l]}</p>

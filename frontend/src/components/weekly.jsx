@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Delta, Kpi, Rich, Status } from "./bits.jsx";
-import { ACTIONS, LEVEL_MEANING, fmtDay, whyText } from "../lib.js";
+import { ACTIONS, LEVEL_MEANING, fmtDay, shownLevel, weeklyBasis, whyText } from "../lib.js";
 import { t } from "../i18n.js";
 
 const pc = (x) => `${Math.round(x * 100)}%`;
@@ -12,9 +12,10 @@ const smallest = (c) => (c && c.level === "watch" && c.rain_signal && c.cases_fo
 export default function WeeklyCard({ name, w, lead, onLead, model, evaluation, onSave }) {
   const c = w?.[lead];
   if (!c) return null;
-  const lv = c.level, known = c.case_signal != null;
+  const lv = c.level, known = c.case_signal != null, shown = shownLevel(c);
   const r = c.risk, hp = model?.[lead]?.high_priority?.heldout, held = evaluation?.[lead]?.heldout;
-  const end = c.decided;
+  const pub = evaluation?.[lead]?.heldout_public;
+  const end = c.decided, fromReport = !c.officer && c.cases_to && c.cases_to !== end;
   return (
     <section className="card span-2 weekly">
       <div className="weekly-head">
@@ -32,7 +33,7 @@ export default function WeeklyCard({ name, w, lead, onLead, model, evaluation, o
         </div>
       </div>
 
-      <Status level={lv} text={whyText(c)} meaning={LEVEL_MEANING[lv]} />
+      <Status level={shown} text={whyText(c)} meaning={LEVEL_MEANING[shown]} />
       {r?.p != null && (
         <p className="risk"><span className="risk-n">{pc(r.p)}</span>
           <span>{t("wk_risk")} <span className="risk-range">{t("risk_range", { low: pc(r.low), high: pc(r.high) })}</span></span></p>
@@ -42,15 +43,19 @@ export default function WeeklyCard({ name, w, lead, onLead, model, evaluation, o
           {t("wk_hp", { right: hp.right, alerts: hp.alerts, pct: Math.round(hp.precision * 100) })}</p>
       )}
       <p className={`basis ${known ? "" : "partial"}`}>
-        <Rich text={t(known ? "wk_basis" : "wk_basis_rain", { date: fmtDay(end) })} />
+        <Rich text={weeklyBasis(c)} />
       </p>
+      {c.low_confidence && known && (
+        <p className="low-conf"><span className="badge">{t("low_conf")}</span> {t("wk_low_conf")}</p>
+      )}
 
       <div className="weekly-grid">
         <div className="kpis">
           <Kpi icon="rain" label={t("wk_rain", { date: fmtDay(end) })} value={c.rainy_days}
             reference={t("usual_days", { n: Math.round(c.rainy_days_normal) })}
             delta={c.rain_signal ? <Delta tone="up">{t("wetter")}</Delta> : <Delta tone="flat">{t("not_wetter")}</Delta>} />
-          <Kpi icon="cases" label={t("wk_cases", { date: fmtDay(end) })} value={known ? c.cases_data_month : "—"}
+          <Kpi icon="cases" label={fromReport ? t("wk_cases_public", { date: fmtDay(c.cases_to) }) : t("wk_cases", { date: fmtDay(end) })}
+            value={known ? c.cases_data_month : "—"}
             reference={c.cases_normal != null ? t("usual", { n: Math.round(c.cases_normal) }) : t("not_reported")}
             delta={known ? (c.case_signal ? <Delta tone="up">{t("more_cases")}</Delta> : <Delta tone="flat">{t("not_more")}</Delta>)
               : <Delta tone="flat">{t("waiting")}</Delta>} />
@@ -68,7 +73,8 @@ export default function WeeklyCard({ name, w, lead, onLead, model, evaluation, o
         <ul className="quick-actions">{ACTIONS[lv].slice(0, 3).map((a) => <li key={a}>{a}</li>)}</ul>
       )}
       {held?.warning?.precision != null && (
-        <p className="note">{t("wk_record", { p: Math.round(held.warning.precision * 100), b: Math.round(held.base_rate * 100),
+        <p className="note">{t(pub ? "wk_record_both" : "wk_record", { p: Math.round(held.warning.precision * 100),
+          q: pub ? Math.round(pub.warning.precision * 100) : "", b: Math.round(held.base_rate * 100),
           lead: lead === "1" ? t("wk_next") : t("wk_after") })}</p>
       )}
     </section>

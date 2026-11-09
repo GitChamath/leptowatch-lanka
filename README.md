@@ -180,6 +180,31 @@ the engine, which skips the few decisions without a full 8 weeks of rain history
 (893 of 1,245) and 66.4% (834 of 1,256); the site shows 72% and 66%. Held-out years had already been seen once for the
 old rule, so this is a second look at them, with the choice made on development years only.
 
+**How late public case reports really are (correction, 9 November 2026).** The back-test above treats each Weekly
+Epidemiological Report as known on the last day of the week it covers. That matches an officer entering their own
+count for the last 4 weeks, but not public reports. The Epidemiology Unit's file names carry their upload time: for
+the 158 reports from 2023–2026 that have one, upload came a median 57 days after the week's end (never under 17; the
+2026 reports so far took 48 to 64 days). So `lw/weekly.py` now has `PUBLIC_DELAY = 56` days (8 weeks, set from that
+measurement, not from the scores), and `scripts/build_weekly.py` also scores the same rule using only reports that
+would already have been online (`heldout_public` in `data/weekly_state.json`):
+
+| Held-out 2018+, Warning right when it fires | Next 4 weeks | Weeks 5–8 |
+|---|---|---|
+| Officer's up-to-date count (as above) | **71.7%** (893 of 1,245) | **66.4%** (834 of 1,256) |
+| Public reports only, 8 weeks late | **66.0%** (699 of 1,059) | **61.0%** (659 of 1,080) |
+| Windows worse than normal anyway | 54% | 54% |
+
+The site now shows both. The rule itself is unchanged. Two changes to live use follow from this:
+
+- *Live outlook uses the latest public report when it is under 9 weeks old* (`PUBLIC_DELAY` + 7 days), exactly as the
+  public-only back-test does; before, it only used a report from the last 7 days, which public reports never are, so
+  without an officer count every district fell back to rain alone. An officer's count still replaces it.
+- *A Watch with no case count at all is shown as "Needs case count"*, not as Watch. Looked at after the fact on
+  held-out years, a rain-only Watch with no case count was right 56% of the time against 54% by chance, so it should
+  not look like an alert. This changes only the display; Warning, Watch and Normal and their scores are unchanged.
+  (Rain up with cases known and not up was right 46.5%, below chance, but changing the rule for that would be a
+  choice made on held-out years, so it was not done.)
+
 **Two more ideas, not adopted.** Same method each time: explore on 2011–2017, fix the choice in writing, run 2018+ once.
 
 - *Soil moisture* (NASA POWER top-soil and root-zone wetness, 28 or 56 days, instead of, with, or as an alternative
@@ -193,10 +218,12 @@ With these sources, rain plus a clear rise in cases looks close to the ceiling.
 
 **Case study: Jaffna, December 2024** (`research/case_jaffna_2024.md`, `research/case_study.py`). A leptospirosis
 outbreak after north-east monsoon rain and Cyclone Fengal killed 5–8 people; deaths were reported from 11 December.
-Replayed on the data available each Saturday, the weekly outlook put Jaffna on Warning from 2 November and every week
-of November, about six weeks before cases peaked (218 in the 4 weeks to 28 December, against about 5 usual). Caveats:
-it is a replay, Jaffna's usual is so low that a handful of cases passed the bar, and it dropped to Watch for one week
-on 7 December.
+Replayed with the officer's own counts, the weekly outlook put Jaffna on Warning from 2 November and every week
+of November, about six weeks before cases peaked (218 in the 4 weeks to 28 December, against about 5 usual). With
+public reports only, 8 weeks late, it stayed on Watch through November and gave its first Warning on 7 December,
+four days before deaths were reported: the early warning depends on officers entering their own counts. Caveats: it is a replay, Jaffna's
+usual is so low that a handful of cases passed the bar, and with officer counts it dropped to Watch for one week on
+7 December.
 
 The earlier zone-level analysis (69% vs a 48% base rate) did not hold up at district level on newer data.
 `research/` contains every test, including the ones that weakened the original claim.

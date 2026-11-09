@@ -24,7 +24,7 @@ export function AnimatedNumber({ value, duration = 0.8 }) {
 }
 
 export function Status({ level, text, meaning }) {
-  const I = Icon[level];
+  const I = Icon[level] || Icon.cases;
   return (
     <div className={`status ${level}`}>
       <div className="ico pop">

@@ -3,14 +3,14 @@ import { motion } from "framer-motion";
 import MapView from "../components/MapView.jsx";
 import Panel from "../components/Panel.jsx";
 import { AnimatedNumber, Segmented } from "../components/bits.jsx";
-import { LEVEL, LEVELS, LEVEL_MEANING, fmt, fmtDay, levelColor, rainOnly, whenLabel } from "../lib.js";
+import { LEVEL, LEVELS, LEVEL_MEANING, SHOWN, fmt, fmtDay, levelColor, rainOnly, shownLevel, whenLabel } from "../lib.js";
 import { t } from "../i18n.js";
 
 /** Count of districts at each level, and the Warning/Watch districts in priority order. */
 export function useTally(summary, levelOf, keep = ALL) {
   return useMemo(() => {
-    const tally = { warning: 0, watch: 0, normal: 0 };
-    const rank = { warning: 0, watch: 1 };
+    const tally = { warning: 0, watch: 0, needcount: 0, normal: 0 };
+    const rank = { warning: 0, watch: 1, needcount: 2 };
     const names = summary ? Object.keys(summary.districts).filter(keep) : [];
     names.forEach((n) => { const l = levelOf(n); if (l in tally) tally[l]++; });
     const attention = names.filter((n) => levelOf(n) in rank)
@@ -24,7 +24,7 @@ const ALL = () => true;
 export function Counts({ tally, rainCount }) {
   return (
     <div className="counts">
-      {LEVELS.map((l) => (
+      {SHOWN.filter((l) => l !== "needcount" || tally.needcount > 0).map((l) => (
         <motion.div key={l} className="count" layout>
           <i className="key" style={{ background: levelColor(l) }} />
           <b><AnimatedNumber value={tally[l]} duration={0.5} /></b>{LEVEL[l]}
@@ -36,11 +36,11 @@ export function Counts({ tally, rainCount }) {
 }
 
 export function Legend({ soft = false }) {
-  const items = [...LEVELS, "nodata"].flatMap((l) => (soft && l === "watch" ? [l, "watch_rain"] : [l]));
+  const items = soft ? ["warning", "watch", "watch_rain", "needcount", "normal", "nodata"] : [...LEVELS, "nodata"];
   return (
-    <div className="legend glass">
+    <div className={`legend glass ${soft ? "low" : ""}`}>
       {items.map((l) => (
-        <span key={l}><i className="key" style={{ background: levelColor(l) }} />
+        <span key={l} title={l === "watch_rain" ? t("watch_rain_meaning") : LEVEL_MEANING[l]}><i className="key" style={{ background: levelColor(l) }} />
           <b>{l === "watch_rain" ? `${LEVEL.watch} · ${t("rain_only")}` : LEVEL[l]}</b>
           <em>{l === "watch_rain" ? t("watch_rain_meaning") : LEVEL_MEANING[l]}</em></span>
       ))}
@@ -70,9 +70,12 @@ export default function MapPage({ summary, geo, view, onView, weekly, getDistric
     return () => { live = false; };
   }, [selected, summary]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const levelOf = useCallback((n) => recordOf(summary, weekly, view, n)?.level || "nodata", [summary, weekly, view]);
+  const soft = view.startsWith("w");                    // the weekly outlook: "needs case count" and rain-only Watches
+  const levelOf = useCallback((n) => {
+    const c = recordOf(summary, weekly, view, n);
+    return soft ? shownLevel(c) : c?.level || "nodata";
+  }, [summary, weekly, view, soft]);
   const { tally, attention: byLevel } = useTally(summary, levelOf);
-  const soft = view.startsWith("w");                    // the weekly outlook marks rain-only Watches
   const softOf = useCallback((n) => soft && rainOnly(recordOf(summary, weekly, view, n)), [soft, summary, weekly, view]);
   const rainCount = useMemo(() => Object.keys(summary.districts).filter(softOf).length, [summary, softOf]);
   const attention = useMemo(() => byLevel

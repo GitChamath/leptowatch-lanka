@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Icon } from "../icons.jsx";
-import { ACTIONS, LEVEL, LEVELS, LEVEL_MEANING, PROVINCE, WHY, fmt, fmtDay, levelColor, mon, whyText } from "../lib.js";
+import { ACTIONS, LEVEL, LEVEL_MEANING, PROVINCE, SHOWN, WHY, fmt, fmtDay, levelColor, mon, shownLevel, weeklyBasis, whyText } from "../lib.js";
 import { dname, province, t } from "../i18n.js";
 import { districtHref } from "../router.js";
 import { AnimatedNumber, Delta, Kpi, Rich, Status } from "./bits.jsx";
@@ -49,7 +49,7 @@ function Overview({ tally, mode, lag, target, rainMonth, attention = [], onPick,
           : weeklyTo ? t("wk_overview", { date: fmtDay(weeklyTo) }) : t("ov_outlook", { month: fmt(rainMonth) })}
       </motion.p>
       <motion.div className="ov-grid rise">
-        {LEVELS.map((l) => (
+        {SHOWN.filter((l) => l !== "needcount" || tally.needcount > 0).map((l) => (
           <motion.div key={l} className="ov" whileHover={{ y: -3 }}>
             <div className="n"><AnimatedNumber value={tally[l]} /></div>
             <div className="l"><i className="key" style={{ background: levelColor(l) }} />{LEVEL[l]}</div>
@@ -93,16 +93,16 @@ function QuickCard({ selected: n, detail: d, lag, onClose, weeklyRec, onSaveWeek
   const c = weeklyRec || d?.current?.[lag];
   if (!d && !weeklyRec) return <Header name={n} sub={t("loading")} onClose={onClose} />;
   if (!c) return <><Header name={n} sub="" onClose={onClose} /><div className="section"><Status level="nodata" text={WHY.nodata} /></div></>;
-  const lv = c.level, known = c.case_signal != null;
+  const lv = c.level, known = c.case_signal != null, shown = weeklyRec ? shownLevel(c) : lv;
   return (
     <>
       <Header name={n} sub={weeklyRec ? t("wk_range", { from: fmtDay(c.target_from), to: fmtDay(c.target_end) })
         : t("outlook_for", { month: fmt(c.target) })} onClose={onClose} />
       <motion.div className="stagger">
         <motion.div className="section rise">
-          <Status key={lv + lag} level={lv} text={whyText(c)} meaning={LEVEL_MEANING[lv]} />
+          <Status key={shown + lag} level={shown} text={whyText(c)} meaning={LEVEL_MEANING[shown]} />
           <p className={`basis ${known ? "" : "partial"}`}>
-            <Rich text={weeklyRec ? t(known ? "wk_basis" : "wk_basis_rain", { date: fmtDay(c.decided) })
+            <Rich text={weeklyRec ? weeklyBasis(c)
               : t(known ? "basis_full_short" : "basis_rain_short", { month: fmt(c.data_month) })} />
           </p>
           {c.risk?.p != null && (

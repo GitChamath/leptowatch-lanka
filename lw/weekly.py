@@ -14,6 +14,9 @@ The 8-week rain window and the 1.4 x normal Warning bar come from accuracy round
 (research/PREREG_weekly_v2.md): chosen on 2011-2017, then scored once on 2018 onwards.
 
 Judged against: cases in the next 28 days (lead 1) or in days 29-56 (lead 2) above the normal for that window.
+Two back-tests: with the officer's own count for the 28 days to W (what the dashboard asks for), and with
+public reports only, which go online about PUBLIC_DELAY days late. The live outlook uses the officer's count
+when entered, otherwise the latest public report under PUBLIC_DELAY + 7 days old.
 Weekly cases come from the year-to-date totals in each Weekly Epidemiological Report, interpolated
 by day between reports no more than MAX_GAP days apart.
 """
@@ -30,6 +33,10 @@ WINDOW = 28                 # days in each case window
 RAIN_WINDOW = 56            # days of rain behind each decision (accuracy round 2)
 WARNING_CASE_RATIO = 1.4    # a Warning needs cases above 1.4 x normal (accuracy round 2)
 MAX_GAP = 21                # longest gap between reports we interpolate across
+# Weekly Epidemiological Reports go online about 8 weeks after the week they cover: the upload time inside the
+# Epidemiology Unit's file names is a median 57 days (never under 17) after the week's end for the 158 reports from
+# 2023-2026 that carry one (2026 so far: 48 to 64 days). The public-only back-test and the live outlook allow for this.
+PUBLIC_DELAY = 56
 LEADS = (1, 2)              # 1: next 28 days; 2: days 29-56
 SEASONAL_MIN_YEARS = 5
 FIRST_DECISION = dt.date(2011, 1, 1)
@@ -167,7 +174,11 @@ class District:
                     r.append(x)
         return st.median(r) if len(r) >= SEASONAL_MIN_YEARS else None
 
-    def assess(self, w, lead):
+    def assess(self, w, lead, delay=0, max_age=7):
+        """Decision on Saturday w. Case reports count as published `delay` days after the week they cover, and
+        the latest published one is used if it is at most `max_age` days older than that.
+        delay=0: the officer's own count for the 4 weeks to w (the figure the dashboard asks for).
+        delay=PUBLIC_DELAY: public Weekly Epidemiological Reports only, as they really appear online."""
         rd = self.rainy(w)
         if rd is None:
             return None
@@ -175,10 +186,12 @@ class District:
         if len(hist) < config.HISTORY_MIN:
             return None
         rn = st.median(hist)
-        # cases: only reports published by w. The window ends at the latest report on or before w (within a week);
-        # interpolating to w itself would borrow the next report, which does not exist yet on decision day.
-        cw = self.cases.last_on_or_before(w)
-        if cw is None or (w - cw).days > 7:
+        # cases: the window ends at the latest report available on decision day; interpolating to w itself would
+        # borrow a report that does not exist yet.
+        seen = w - dt.timedelta(delay)
+        cw = self.cases.last_on_or_before(seen)
+        if cw is None or (seen - cw).days > max_age:
+            cw = None
             lv = c = si_now = None
         else:
             lv, c, si_now = self.level(cw), self.window(cw), self.seasonal(cw, cw)
@@ -193,7 +206,7 @@ class District:
             "decided": w.isoformat(), "target": t_end.isoformat()[:7], "target_end": t_end.isoformat(), "lag": lead,
             "level": level_of(rain_signal, c, normal), "cases_for_warning": cases_for_warning(normal),
             "rain_signal": rain_signal, "case_signal": case_signal,
-            "rainy_days": rd, "rainy_days_normal": round(rn, 1),
+            "rainy_days": rd, "rainy_days_normal": round(rn, 1), "cases_to": cw.isoformat() if cw else None,
             "cases_data_month": None if c is None else round(c), "cases_normal": round(normal, 1) if normal else None,
             "expected": round(expected, 1) if expected else None,
             "actual": None if actual is None else round(actual), "low_confidence": None,
@@ -221,8 +234,8 @@ def decision_days(first, last):
         d += dt.timedelta(7)
 
 
-def history(cons, districts=None):
-    """Back-test records for every district, Saturday and lead."""
+def history(cons, districts=None, delay=0):
+    """Back-test records for every district, Saturday and lead (delay: see District.assess)."""
     pts, (rain, _) = case_points(cons), rain_days(cons)
     last_rain = max(max(r) for r in rain.values() if r)
     out = []
@@ -230,7 +243,7 @@ def history(cons, districts=None):
         d = District(Cases(pts.get(name, {})), rain.get(name, {}))
         for w in decision_days(FIRST_DECISION, last_rain):
             for lead in LEADS:
-                a = d.assess(w, lead)
+                a = d.assess(w, lead, delay=delay)
                 if a:
                     out.append(a | {"district": name})
     return out
@@ -275,31 +288,41 @@ def officer_counts(con):
 
 
 def live_assess(d, w, lead, officer):
-    """Like District.assess, but the last 28 days' cases may come from an officer, and the normal falls back
-    to the most recent 52-week level within two years (public reports lag), marked low confidence."""
-    a = d.assess(w, lead)
+    """Like District.assess, but the last 28 days' cases may come from an officer. Without one, the latest public
+    report is used if it is under PUBLIC_DELAY + 7 days old, as in the public-only back-test. The normal falls
+    back to the most recent 52-week level within two years, marked low confidence."""
+    a = d.assess(w, lead, max_age=PUBLIC_DELAY + 7)
     if a is None:
         return None
     c = officer.get(w)
-    lv, low = d.level(w), False
+    if c is not None:
+        return _live_record(d, w, lead, a, c, at=w, officer=True)
+    if a["cases_to"]:                                    # public report: judged at the end of its own window
+        return _live_record(d, w, lead, a, a["cases_data_month"], at=dt.date.fromisoformat(a["cases_to"]), officer=False)
+    return _live_record(d, w, lead, a, None, at=w, officer=False)
+
+
+def _live_record(d, w, lead, a, c, at, officer):
+    """Live record for case count c over the 28 days to `at` (w for an officer's count, the report's own end date for
+    a public report). If the 52-week level at `at` is missing (e.g. a report missing at a year end), the latest one
+    within two years is used and the outlook is marked low confidence."""
+    lv, low = d.level(at), False
     if lv is None:
         for back in range(1, 105):
-            lv = d.level(w - dt.timedelta(7 * back))
+            lv = d.level(at - dt.timedelta(7 * back))
             if lv:
                 low = True
                 break
-    si_now, si_t = d.seasonal(w, w), d.seasonal(w + dt.timedelta(WINDOW * lead), w)
+    si_now, si_t = d.seasonal(at, at), d.seasonal(w + dt.timedelta(WINDOW * lead), at)
     normal = lv * si_now if lv and si_now else None
     expected = lv * si_t if lv and si_t else None
-    if c is None:
-        c = a["cases_data_month"]
     case_signal = None if c is None or normal is None else c > normal
     return a | {"cases_data_month": c, "cases_normal": round(normal, 1) if normal else None,
                 "expected": round(expected, 1) if expected else None, "case_signal": case_signal,
                 "level": level_of(a["rain_signal"], c, normal), "cases_for_warning": cases_for_warning(normal),
-                "low_confidence": low,
-                "officer": w in officer, "actual": None, "outcome": None,
-                "window_from": (w - dt.timedelta(WINDOW - 1)).isoformat(),
+                "low_confidence": low, "cases_to": at.isoformat() if c is not None else None,
+                "officer": officer, "actual": None, "outcome": None,
+                "window_from": (at - dt.timedelta(WINDOW - 1)).isoformat(),
                 "rain_from": (w - dt.timedelta(RAIN_WINDOW - 1)).isoformat(),
                 "target_from": (w + dt.timedelta(WINDOW * (lead - 1) + 1)).isoformat()}
 
