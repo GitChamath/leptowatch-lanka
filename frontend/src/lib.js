@@ -162,7 +162,7 @@ export function centroidOf(geom) {
 }
 
 /* ---------- API ---------- */
-/* The static copy of the dashboard (scripts/export_static.py, published to GitHub Pages) sets window.LW_STATIC and
+/* The static copy of the dashboard (scripts/export_static.py, for any static web host) sets window.LW_STATIC and
  * serves each API answer as a JSON file. There, an officer's weekly count is applied in the browser with the same
  * rule as lw/weekly.py (level_of), using the normal the server pre-computed for a count entered today
  * (officer_normal); nothing is saved. */

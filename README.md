@@ -1,8 +1,5 @@
 # LeptoWatch Lanka
 
-**Live demo:** https://gitchamath.github.io/leptowatch-lanka/ (nothing to install; case counts typed there stay in
-your browser and are not saved).
-
 A district-level leptospirosis early warning for Sri Lanka. Every Saturday it combines rain over the last
 8 weeks with cases over the last 4 weeks, and gives a district health officer one alert for the next 8 weeks:
 how likely they are to be **worse than a normal season** for that district. The alert is scored separately
@@ -51,7 +48,7 @@ commits the refreshed snapshot.
 `python -m unittest discover -s tests` runs the tests.
 `python scripts/export_static.py site` writes a static copy of the dashboard (every API answer as a JSON file; an
 officer's weekly count is applied in the browser with the same rule, using the normal the server pre-computed, and
-not saved). `.github/workflows/pages.yml` publishes it to GitHub Pages on every push and after each weekly update.
+not saved), which any static web host can serve without Python.
 
 The dashboard is a React app (Vite + Framer Motion) in `frontend/`. The built files are committed in `web/`,
 so Node is only needed to change the UI:
@@ -347,7 +344,7 @@ The earlier zone-level analysis (69% vs a 48% base rate) did not hold up at dist
 lw/          collectors (wer.py, chirps.py, openmeteo.py), store, monthly series, engine, weekly outlook
              (weekly.py), risk model (ml.py), server
 scripts/     seed, update, build_state, build_weekly, backfill_weekly, compare_models, export_seed,
-             export_dataset, export_static (GitHub Pages copy), serve
+             export_dataset, export_static (static copy), serve
 frontend/    React dashboard source (home, map, district report, How it works, past-season replay)
 web/         built dashboard served by lw/server.py
 tests/       parser and engine tests

@@ -1,4 +1,4 @@
-"""Static copy of the dashboard for GitHub Pages: the built site plus every API answer as a JSON file.
+"""Static copy of the dashboard for any static web host: the built site plus every API answer as a JSON file.
 
     python scripts/export_static.py site      # writes ./site
 
