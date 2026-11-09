@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Icon } from "../icons.jsx";
+import { FieldScene, SpreadArt } from "../components/illustrations.jsx";
 import { t, useLang } from "../i18n.js";
 import { LEVEL, LEVELS, SHOWN, fmt, fmtDay, levelColor, shownLevel, whenLabel } from "../lib.js";
 
@@ -11,6 +12,18 @@ const TEXT = {
     lead: "LeptoWatch checks rainfall and leptospirosis (rat fever) case reports for all 25 districts every week. It compares them with what is normal for each district at that time of year and gives an early alert for the next 4 weeks and for weeks 5 to 8, so prevention can start before patients arrive.",
     cta_map: "Open the map", cta_how: "How it works",
     snap: "Right now",
+    rf_title: "What is rat fever?",
+    rf_lead: [
+      "Rat fever (leptospirosis) is caused by spiral-shaped bacteria, Leptospira, that live in the kidneys of rats and other animals such as cattle and dogs. Their urine carries the bacteria into water and wet soil, where they can survive for weeks.",
+      "People are infected when that water or mud touches cuts, scratches or soaked skin, or splashes into the eyes, nose or mouth. Paddy farmers and people wading through floodwater are most at risk, which is why cases rise after heavy rain.",
+      "Treated early it can be cured. Treated late it can damage the kidneys and lungs and kill, so warning early matters.",
+    ],
+    rf_cards: [
+      ["rat", "Rats carry it", "Infected rats, cattle and dogs pass the bacteria in their urine, often without looking sick."],
+      ["water", "Water spreads it", "Rain and floods wash it into paddy fields, canals and puddles."],
+      ["skin", "It enters through skin", "Cuts, scratches and soaked skin in dirty water or mud let it in."],
+      ["protect", "Protect and act early", "Wear boots and gloves, cover wounds, and see a doctor early if a fever follows contact with water or mud."],
+    ],
     decide: "How it decides",
     steps: [
       ["rain", "Rain", "Have the last 8 weeks been wetter than usual for this district? Rainy days are compared with the same weeks in past years."],
@@ -45,6 +58,18 @@ const TEXT = {
     lead: "LeptoWatch සෑම සතියකම දිස්ත්‍රික්ක 25 සඳහාම වර්ෂාපතනය සහ මී උණ (ලෙප්ටොස්පයිරෝසිස්) රෝගී වාර්තා පරීක්ෂා කරයි. එම කාලයට එක් එක් දිස්ත්‍රික්කයට සාමාන්‍ය දේ සමඟ ඒවා සසඳා, ඉදිරි සති 4 සහ සති 5 සිට 8 දක්වා කාලය සඳහා පූර්ව අනතුරු ඇඟවීමක් ලබා දෙයි. එවිට රෝගීන් පැමිණීමට පෙර වැළැක්වීමේ කටයුතු ආරම්භ කළ හැක.",
     cta_map: "සිතියම විවෘත කරන්න", cta_how: "ක්‍රියා කරන ආකාරය",
     snap: "මේ මොහොතේ",
+    rf_title: "මී උණ යනු කුමක්ද?",
+    rf_lead: [
+      "මී උණ (ලෙප්ටොස්පයිරෝසිස්) ඇති වන්නේ මීයන්ගේ සහ ගවයන්, බල්ලන් වැනි වෙනත් සතුන්ගේ වකුගඩුවල ජීවත් වන සර්පිලාකාර ලෙප්ටොස්පයිරා බැක්ටීරියාව නිසාය. ඔවුන්ගේ මුත්‍රා මගින් එම බැක්ටීරියාව ජලයට සහ තෙත් පසට එක් වන අතර, එහි සති ගණනක් ජීවත් විය හැක.",
+      "එම ජලය හෝ මඩ කැපුම්, සීරීම් හෝ පෙඟුණු සමට ගැටුණු විට, නැතහොත් ඇසට, නාසයට හෝ මුඛයට ඉසුණු විට මිනිසුන්ට ආසාදනය වේ. කුඹුරු ගොවීන්ට සහ ගංවතුරෙන් ගමන් කරන අයට වැඩි අවදානමක් ඇති අතර, අධික වැසිවලින් පසු රෝගීන් වැඩි වන්නේ එබැවිනි.",
+      "කලින් ප්‍රතිකාර කළහොත් සුව කළ හැක. ප්‍රමාද වුවහොත් වකුගඩු සහ පෙනහළුවලට හානි කර මරණය දක්වා යා හැකි බැවින් කලින් අනතුරු ඇඟවීම වැදගත්ය.",
+    ],
+    rf_cards: [
+      ["rat", "මීයන් එය රැගෙන යයි", "ආසාදිත මීයන්, ගවයන් සහ බල්ලන් බොහෝ විට අසනීප බවක් නොපෙන්වා මුත්‍රා මගින් බැක්ටීරියාව පිට කරයි."],
+      ["water", "ජලය එය පතුරුවයි", "වැසි සහ ගංවතුර එය කුඹුරු, ඇළ මාර්ග සහ වළවල්වලට ගෙන යයි."],
+      ["skin", "එය සම හරහා ඇතුළු වේ", "අපිරිසිදු ජලයේ හෝ මඩේ කැපුම්, සීරීම් සහ පෙඟුණු සම හරහා එය ඇතුළු වේ."],
+      ["protect", "ආරක්ෂා වී කලින් ක්‍රියා කරන්න", "බූට් සපත්තු සහ අත්වැසුම් පළඳින්න, තුවාල වසා තබන්න, ජලය හෝ මඩ ගැටීමෙන් පසු උණ ආවොත් ඉක්මනින් වෛද්‍යවරයකු හමුවන්න."],
+    ],
     decide: "එය තීරණය කරන්නේ කෙසේද",
     steps: [
       ["rain", "වැසි", "පසුගිය සති 8 තුළ මෙම දිස්ත්‍රික්කයට සුපුරුදු ප්‍රමාණයට වඩා වැසි තිබුණාද? වැසි දින පසුගිය වසරවල එම සති සමඟ සසඳයි."],
@@ -79,6 +104,18 @@ const TEXT = {
     lead: "LeptoWatch ஒவ்வொரு வாரமும் 25 மாவட்டங்களுக்கும் மழைவீழ்ச்சியையும் எலிக்காய்ச்சல் (லெப்டோஸ்பைரோசிஸ்) நோயாளர் அறிக்கைகளையும் சரிபார்க்கிறது. அவற்றை அந்தக் காலத்தில் ஒவ்வொரு மாவட்டத்துக்கும் இயல்பானவற்றுடன் ஒப்பிட்டு, அடுத்த 4 வாரங்களுக்கும் 5 முதல் 8 வரையான வாரங்களுக்கும் முன்னெச்சரிக்கை தருகிறது. இதனால் நோயாளர்கள் வருவதற்கு முன்பே தடுப்பு நடவடிக்கைகளைத் தொடங்கலாம்.",
     cta_map: "வரைபடத்தைத் திறக்கவும்", cta_how: "இது எப்படி வேலை செய்கிறது",
     snap: "இப்போது",
+    rf_title: "எலிக்காய்ச்சல் என்றால் என்ன?",
+    rf_lead: [
+      "எலிக்காய்ச்சல் (லெப்டோஸ்பைரோசிஸ்) எலிகள் மற்றும் மாடுகள், நாய்கள் போன்ற பிற விலங்குகளின் சிறுநீரகங்களில் வாழும் சுருள் வடிவ லெப்டோஸ்பைரா பாக்டீரியாவால் ஏற்படுகிறது. அவற்றின் சிறுநீர் இந்த பாக்டீரியாவை நீரிலும் ஈரமான மண்ணிலும் சேர்க்கிறது; அங்கு அது பல வாரங்கள் உயிர்வாழலாம்.",
+      "அந்த நீர் அல்லது சேறு வெட்டுக்காயங்கள், கீறல்கள், ஊறிய தோலில் படும்போது அல்லது கண், மூக்கு, வாயில் தெறிக்கும்போது மனிதர்களுக்குத் தொற்று ஏற்படுகிறது. வயல் விவசாயிகளும் வெள்ள நீரில் நடப்பவர்களும் அதிக ஆபத்தில் உள்ளனர்; அதனால்தான் கனமழைக்குப் பின் நோயாளர்கள் அதிகரிக்கின்றனர்.",
+      "ஆரம்பத்திலேயே சிகிச்சை பெற்றால் குணமாகும். தாமதித்தால் சிறுநீரகங்களையும் நுரையீரல்களையும் பாதித்து உயிரிழப்பை ஏற்படுத்தலாம்; எனவே முன்கூட்டிய எச்சரிக்கை முக்கியம்.",
+    ],
+    rf_cards: [
+      ["rat", "எலிகள் இதைக் காவுகின்றன", "தொற்றுள்ள எலிகள், மாடுகள், நாய்கள் பெரும்பாலும் நோயுற்றதாகத் தெரியாமலேயே சிறுநீர் மூலம் பாக்டீரியாவை வெளியேற்றுகின்றன."],
+      ["water", "நீர் இதைப் பரப்புகிறது", "மழையும் வெள்ளமும் இதை வயல்கள், கால்வாய்கள், குட்டைகளுக்குக் கொண்டு செல்கின்றன."],
+      ["skin", "இது தோல் வழியாக நுழைகிறது", "அழுக்கு நீரிலோ சேற்றிலோ வெட்டுக்காயங்கள், கீறல்கள், ஊறிய தோல் வழியாக இது நுழைகிறது."],
+      ["protect", "பாதுகாத்து, விரைவாகச் செயல்படுங்கள்", "பூட்ஸ், கையுறைகள் அணியுங்கள், காயங்களை மூடுங்கள், நீர் அல்லது சேற்றுடன் தொடர்புக்குப் பின் காய்ச்சல் வந்தால் விரைவில் மருத்துவரைச் சந்தியுங்கள்."],
+    ],
     decide: "இது எப்படித் தீர்மானிக்கிறது",
     steps: [
       ["rain", "மழை", "கடந்த 8 வாரங்களில் இந்த மாவட்டத்தில் வழக்கத்தை விட அதிக மழை பெய்ததா? மழை நாட்கள் கடந்த ஆண்டுகளின் அதே வாரங்களுடன் ஒப்பிடப்படுகின்றன."],
@@ -175,6 +212,25 @@ export default function HomePage({ summary, weekly }) {
           })}
         </aside>
       </motion.section>
+
+      <section className="home-section home-rf rise">
+        <h2>{T.rf_title}</h2>
+        <div className="rf-intro">
+          <figure className="rf-scene"><FieldScene /></figure>
+          <div className="rf-text">{T.rf_lead.map((p, i) => <p key={i}>{p}</p>)}</div>
+        </div>
+        <ol className="rf-cards">
+          {T.rf_cards.map(([kind, title, text], i) => (
+            <li key={kind} className={`rf-card ${kind}`}>
+              <SpreadArt kind={kind} />
+              <div className="rf-card-body">
+                <h3><span className="home-num">{i + 1}</span>{title}</h3>
+                <p>{text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
 
       <motion.section className="home-section rise">
         <h2>{T.decide}</h2>
