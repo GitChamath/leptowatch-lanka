@@ -1,20 +1,22 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Delta, Kpi, Rich, Status } from "./bits.jsx";
 import { ACTIONS, LEVEL_MEANING, fmtDay, shownLevel, weeklyBasis, whyText } from "../lib.js";
 import { t } from "../i18n.js";
 
 const pc = (x) => `${Math.round(x * 100)}%`;
+const pct = (x) => (x == null ? "—" : Math.round(x * 100));
 /** The case count that would turn this Watch into a Warning: rain must be up, and cases above 1.4 x normal. */
 const smallest = (c) => (c && c.level === "watch" && c.rain_signal && c.cases_for_warning != null ? c.cases_for_warning : null);
 
-/** Weekly rolling outlook for one district: the next 4 weeks (or weeks 5-8), why, and the 4-week case count box. */
-export default function WeeklyCard({ name, w, lead, onLead, model, evaluation, onSave }) {
+/** Weekly rolling outlook for one district: one alert for the next 8 weeks, why, and the 4-week case count box. */
+export default function WeeklyCard({ name, w, model, evaluation, onSave }) {
+  const lead = "1";
   const c = w?.[lead];
   if (!c) return null;
   const lv = c.level, known = c.case_signal != null, shown = shownLevel(c);
   const r = c.risk, hp = model?.[lead]?.high_priority?.heldout, held = evaluation?.[lead]?.heldout;
-  const pub = evaluation?.[lead]?.heldout_public;
+  const held2 = evaluation?.["2"]?.heldout;
+  const pub = evaluation?.["1"]?.heldout_public, pub2 = evaluation?.["2"]?.heldout_public;
   const end = c.decided, fromReport = !c.officer && c.cases_to && c.cases_to !== end;
   return (
     <section className="card span-2 weekly">
@@ -23,14 +25,7 @@ export default function WeeklyCard({ name, w, lead, onLead, model, evaluation, o
           <div className="eyebrow">{t("wk_eyebrow")}</div>
           <h3 className="weekly-title">{t("wk_range", { from: fmtDay(c.target_from), to: fmtDay(c.target_end) })}</h3>
         </div>
-        <div className="seg" role="group" aria-label={t("forecast")}>
-          {[["1", t("wk_next")], ["2", t("wk_after")]].map(([v, label]) => (
-            <button key={v} aria-pressed={v === lead} onClick={() => onLead(v)}>
-              {v === lead && <motion.span layoutId="seg-weekly" className="seg-pill" />}
-              <span className="seg-text">{label}</span>
-            </button>
-          ))}
-        </div>
+        <span className="weekly-span">{t("wk_8")}</span>
       </div>
 
       <Status level={shown} text={whyText(c)} meaning={LEVEL_MEANING[shown]} />
@@ -73,9 +68,9 @@ export default function WeeklyCard({ name, w, lead, onLead, model, evaluation, o
         <ul className="quick-actions">{ACTIONS[lv].slice(0, 3).map((a) => <li key={a}>{a}</li>)}</ul>
       )}
       {held?.warning?.precision != null && (
-        <p className="note">{t(pub ? "wk_record_both" : "wk_record", { p: Math.round(held.warning.precision * 100),
-          q: pub ? Math.round(pub.warning.precision * 100) : "", b: Math.round(held.base_rate * 100),
-          lead: lead === "1" ? t("wk_next") : t("wk_after") })}</p>
+        <p className="note">{t(pub && pub2 ? "wk_record_8" : "wk_record_8_own", { p: pct(held.warning.precision),
+          p2: pct(held2?.warning?.precision), q: pct(pub?.warning?.precision), q2: pct(pub2?.warning?.precision),
+          b: pct(held.base_rate) })}</p>
       )}
     </section>
   );

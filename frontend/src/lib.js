@@ -29,6 +29,15 @@ export const LEVEL_MEANING = byLang({
 export const LEVELS = ["warning", "watch", "normal"];
 const COLOR_VAR = { warning: "--warning", watch: "--watch", watch_rain: "--watch-rain", needcount: "--needcount", normal: "--normal", nodata: "--nodata" };
 /** Weekly map categories, in order: a Watch with no case count yet is shown on its own (see shownLevel). */
+/** One alert covers the next 8 weeks: both scored windows come from the same rule and data on the decision day
+ * (research/PREREG_weekly_lead2.md), so the record shown is the first, stretched to the end of the second. */
+export function eightWeeks(w) {
+  if (!w?.districts) return w;
+  const districts = Object.fromEntries(Object.entries(w.districts).map(([n, d]) => [n,
+    d?.["1"] ? { ...d, "1": { ...d["1"], target_end: d["2"]?.target_end || d["1"].target_end } } : d]));
+  return { ...w, districts };
+}
+
 export const SHOWN = ["warning", "watch", "needcount", "normal"];
 
 /** What the weekly map shows. A Watch with no case count at all is "needs case count": in the back-test, rain alone

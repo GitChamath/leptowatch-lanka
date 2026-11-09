@@ -7,8 +7,8 @@ import WeeklyCard from "../components/weekly.jsx";
 import { ACTIONS, LEVEL, LEVEL_MEANING, PROVINCE, WHY, casesForWarning, fmt, mon, shownLevel, whenLabel, whyText } from "../lib.js";
 
 /** Everything about one district, laid out as a report: the answer first, then the evidence. */
-export default function DistrictPage({ name, summary, lag, onLag, getDistrict, onSaveCount, weekly, view, onView, onSaveWeekly }) {
-  const wlead = view?.startsWith("w") ? view.slice(1) : "1";
+export default function DistrictPage({ name, summary, lag, onLag, getDistrict, onSaveCount, weekly, onSaveWeekly }) {
+  const wlead = "1";          // one 8-week outlook
   const wk = weekly?.districts?.[name];
   const [d, setD] = useState(null);
   const [failed, setFailed] = useState(false);
@@ -46,7 +46,7 @@ export default function DistrictPage({ name, summary, lag, onLag, getDistrict, o
       </header>
       {wk ? (
         <div className="report weekly-wrap">
-          <WeeklyCard name={name} w={wk} lead={wlead} onLead={(l) => onView(`w${l}`)}
+          <WeeklyCard name={name} w={wk}
             model={weekly.ml} evaluation={weekly.evaluation} onSave={onSaveWeekly} />
           {["warning", "watch"].includes(shownLevel(wk[wlead])) && (
             <section className="card span-2"><Messages district={name} c={wk[wlead]} /></section>

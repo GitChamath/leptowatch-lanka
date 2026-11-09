@@ -1,14 +1,15 @@
 # LeptoWatch Lanka
 
 A district-level leptospirosis early warning for Sri Lanka. Every Saturday it combines rain over the last
-8 weeks with cases over the last 4 weeks, and tells a district health officer whether the next 4 weeks, and
-weeks 5 to 8, are likely to be **worse than a normal season** for that district.
+8 weeks with cases over the last 4 weeks, and gives a district health officer one alert for the next 8 weeks:
+how likely they are to be **worse than a normal season** for that district. The alert is scored separately
+against weeks 1–4 and weeks 5–8.
 
 - **Warning**: wetter than usual and cases clearly above usual (over 1.4 × usual). **Watch**: one of the two.
   **Normal**: neither. **Needs case count**: wetter than usual but no recent case count, so the officer is asked
   to enter one.
 - On 2018 onwards, held out while the rules were chosen on 2011–2017, a Warning was followed by more cases than
-  usual **72%** of the time for the next 4 weeks and **66%** for weeks 5 to 8 when the officer entered an
+  usual **72%** of the time in weeks 1 to 4 and **66%** in weeks 5 to 8 when the officer entered an
   up-to-date count, and **66%** and **61%** using public reports alone, which go online about 8 weeks late.
   By chance it would be 54%. Details under [How good it is](#how-good-it-is).
 - The dashboard is in English, Sinhala and Tamil. It also keeps the earlier monthly outlook ("Past seasons").
@@ -222,7 +223,7 @@ The site now shows both. The rule itself is unchanged. Two changes to live use f
   (Rain up with cases known and not up was right 46.5%, below chance, but changing the rule for that would be a
   choice made on held-out years, so it was not done.)
 
-**Two more ideas, not adopted.** Same method each time: explore on 2011–2017, fix the choice in writing, run 2018+ once.
+**Three more ideas, not adopted.** Same method each time: explore on 2011–2017, fix the choice in writing, run 2018+ once.
 
 - *Soil moisture* (NASA POWER top-soil and root-zone wetness, 28 or 56 days, instead of, with, or as an alternative
   to 8-week rain; `research/PREREG_soil.md`, `research/soil_test.py`). No soil rule beat 8-week rain on development
@@ -230,6 +231,12 @@ The site now shows both. The rule itself is unchanged. Two changes to live use f
 - *Neighbouring districts' cases* (`research/PREREG_neighbours.md`, `research/neighbour_test.py`). The chosen rule
   (own cases above 1.4 × usual, or above usual with neighbours above 2 × usual) scored 71.4% and 66.5% held-out against
   71.8% and 66.3%. It did not win at both distances, so it was not adopted.
+- *A separate rule for weeks 5–8* (`research/PREREG_weekly_lead2.md`, `research/weekly_lead2.py`). Both outlooks
+  come from one rule applied to the same data, so they always show the same colour. 180 candidates (rain over
+  4, 8 or 12 weeks at three bars, five case bars, a rising-cases and a rising-season option) were scored on
+  development years. None beat the current rule (65.7%), so it was chosen again, nothing changed, and held-out
+  years were not used. The dashboard therefore shows one 8-week outlook with both scores, not two views that
+  could never differ.
 
 With these sources, rain plus a clear rise in cases looks close to the ceiling.
 

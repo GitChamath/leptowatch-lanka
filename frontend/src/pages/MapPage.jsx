@@ -48,13 +48,13 @@ export function Legend({ soft = false }) {
   );
 }
 
-/** The record behind a map view: weekly ("w1", "w2") or monthly ("1", "2"). */
+/** The record behind a map view: weekly ("w1", the 8-week outlook) or monthly ("1", "2"). */
 const recordOf = (summary, weekly, view, n) => (view.startsWith("w")
   ? weekly?.districts?.[n]?.[view.slice(1)] : summary.districts?.[n]?.current?.[view]);
 
 /** Switcher options: weekly first when available, then the two monthly outlooks. */
 const viewOptions = (summary, weekly) => (weekly
-  ? [["w1", t("wk_next")], ["w2", t("wk_after")]]
+  ? [["w1", t("wk_8")]]
   : summary.horizon.map((m, i) => [String(i + 1), `${fmt(m)} · ${whenLabel(m)}`]));
 
 export default function MapPage({ summary, geo, view, onView, weekly, getDistrict, onSaveWeekly }) {

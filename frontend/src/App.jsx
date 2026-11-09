@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Footer from "./components/Footer.jsx";
 import { Loading } from "./components/bits.jsx";
 import { Icon } from "./icons.jsx";
-import { api, fmt, fmtDay } from "./lib.js";
+import { api, eightWeeks, fmt, fmtDay } from "./lib.js";
 import { useRoute } from "./router.js";
 import { LANGS, dname, setLang, t, useLang } from "./i18n.js";
 import AboutPage from "./pages/AboutPage.jsx";
@@ -30,7 +30,7 @@ export default function App() {
     Promise.all([api("/api/summary"), api("/data/districts.geojson")])
       .then(([s, g]) => { setSummary(s); setGeo(g); })
       .catch((e) => setError(e.message));
-    api("/api/weekly").then(setWeekly).catch(() => setWeekly(null));   // optional: the monthly site works without it
+    api("/api/weekly").then((w) => setWeekly(eightWeeks(w))).catch(() => setWeekly(null));   // optional: the monthly site works without it
   }, []);
   useEffect(() => { window.scrollTo(0, 0); }, [route.page, route.param]);
 
@@ -47,7 +47,7 @@ export default function App() {
 
   const saveWeekly = async (district, end, value) => {
     await api("/api/weekly_cases", { method: "POST", body: `${district},${end},${value}` });
-    setWeekly(await api("/api/weekly"));
+    setWeekly(eightWeeks(await api("/api/weekly")));
     setToast(t("toast_saved", { district: dname(district), month: fmtDay(end) }));
     setTimeout(() => setToast(""), 3200);
   };

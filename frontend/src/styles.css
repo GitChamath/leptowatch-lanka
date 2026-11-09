@@ -552,6 +552,7 @@ html:lang(si) body, html:lang(ta) body { line-height: 1.65; }
 .card.weekly { display: grid; gap: 12px; border: 1px solid color-mix(in srgb, var(--brand) 35%, var(--line)); }
 .weekly-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
 .weekly-title { margin: 2px 0 0; font-family: var(--serif); font-size: 22px; font-weight: 650; }
+.weekly-span { padding: 7px 14px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 14px; font-weight: 600; }
 .weekly-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: start; }
 .weekly-entry h3 { margin: 0 0 8px; font-size: 13px; }
 .forecast { margin: 0; padding: 8px 12px; border-radius: 9px; background: var(--raised); font-size: 13.5px; color: var(--ink-2); }

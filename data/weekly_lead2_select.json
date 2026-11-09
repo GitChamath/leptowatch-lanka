@@ -1,0 +1,208 @@
+{
+ "current": {
+  "rule": {
+   "R": 56,
+   "e": 0,
+   "k": 1.4,
+   "trend": false,
+   "season": false
+  },
+  "dev": {
+   "alerts": 233,
+   "correct": 153,
+   "precision": 0.657,
+   "recall": 0.15,
+   "lift": 1.4
+  }
+ },
+ "eligible": 17,
+ "chosen": {
+  "rule": {
+   "R": 56,
+   "e": 0,
+   "k": 1.4,
+   "trend": false,
+   "season": false
+  },
+  "name": "rain 8 weeks > usual + 0, cases > 1.4 x usual",
+  "dev": {
+   "alerts": 233,
+   "correct": 153,
+   "precision": 0.657,
+   "recall": 0.15,
+   "lift": 1.4
+  }
+ },
+ "top": [
+  {
+   "rule": {
+    "R": 56,
+    "e": 0,
+    "k": 1.4,
+    "trend": false,
+    "season": false
+   },
+   "name": "rain 8 weeks > usual + 0, cases > 1.4 x usual",
+   "dev": {
+    "alerts": 233,
+    "correct": 153,
+    "precision": 0.657,
+    "recall": 0.15,
+    "lift": 1.4
+   }
+  },
+  {
+   "rule": {
+    "R": 84,
+    "e": 0,
+    "k": 1.2,
+    "trend": true,
+    "season": false
+   },
+   "name": "rain 12 weeks > usual + 0, cases > 1.2 x usual, rising",
+   "dev": {
+    "alerts": 201,
+    "correct": 132,
+    "precision": 0.657,
+    "recall": 0.129,
+    "lift": 1.4
+   }
+  },
+  {
+   "rule": {
+    "R": 56,
+    "e": 0,
+    "k": 1.2,
+    "trend": false,
+    "season": false
+   },
+   "name": "rain 8 weeks > usual + 0, cases > 1.2 x usual",
+   "dev": {
+    "alerts": 274,
+    "correct": 179,
+    "precision": 0.653,
+    "recall": 0.175,
+    "lift": 1.39
+   }
+  },
+  {
+   "rule": {
+    "R": 56,
+    "e": 0,
+    "k": 1.0,
+    "trend": false,
+    "season": false
+   },
+   "name": "rain 8 weeks > usual + 0, cases > 1.0 x usual",
+   "dev": {
+    "alerts": 332,
+    "correct": 216,
+    "precision": 0.651,
+    "recall": 0.212,
+    "lift": 1.38
+   }
+  },
+  {
+   "rule": {
+    "R": 84,
+    "e": 0,
+    "k": 1.0,
+    "trend": true,
+    "season": false
+   },
+   "name": "rain 12 weeks > usual + 0, cases > 1.0 x usual, rising",
+   "dev": {
+    "alerts": 229,
+    "correct": 149,
+    "precision": 0.651,
+    "recall": 0.146,
+    "lift": 1.38
+   }
+  },
+  {
+   "rule": {
+    "R": 56,
+    "e": 0,
+    "k": 1.0,
+    "trend": true,
+    "season": false
+   },
+   "name": "rain 8 weeks > usual + 0, cases > 1.0 x usual, rising",
+   "dev": {
+    "alerts": 214,
+    "correct": 139,
+    "precision": 0.65,
+    "recall": 0.136,
+    "lift": 1.38
+   }
+  },
+  {
+   "rule": {
+    "R": 84,
+    "e": 0,
+    "k": 1.4,
+    "trend": false,
+    "season": false
+   },
+   "name": "rain 12 weeks > usual + 0, cases > 1.4 x usual",
+   "dev": {
+    "alerts": 257,
+    "correct": 166,
+    "precision": 0.646,
+    "recall": 0.163,
+    "lift": 1.37
+   }
+  },
+  {
+   "rule": {
+    "R": 56,
+    "e": 3,
+    "k": 1.0,
+    "trend": false,
+    "season": false
+   },
+   "name": "rain 8 weeks > usual + 3, cases > 1.0 x usual",
+   "dev": {
+    "alerts": 196,
+    "correct": 126,
+    "precision": 0.643,
+    "recall": 0.123,
+    "lift": 1.37
+   }
+  },
+  {
+   "rule": {
+    "R": 84,
+    "e": 0,
+    "k": 1.0,
+    "trend": false,
+    "season": false
+   },
+   "name": "rain 12 weeks > usual + 0, cases > 1.0 x usual",
+   "dev": {
+    "alerts": 360,
+    "correct": 230,
+    "precision": 0.639,
+    "recall": 0.225,
+    "lift": 1.36
+   }
+  },
+  {
+   "rule": {
+    "R": 84,
+    "e": 0,
+    "k": 1.2,
+    "trend": false,
+    "season": false
+   },
+   "name": "rain 12 weeks > usual + 0, cases > 1.2 x usual",
+   "dev": {
+    "alerts": 301,
+    "correct": 192,
+    "precision": 0.638,
+    "recall": 0.188,
+    "lift": 1.36
+   }
+  }
+ ]
+}
