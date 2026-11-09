@@ -55,13 +55,26 @@ def case_points(cons):
     for district, years in pts.items():
         out[district] = {}
         for y, by_day in years.items():
-            p = [(dt.date(y - 1, 12, 31), 0)] + sorted(by_day.items())
-            clean = [p[0]]
-            for d, v in p[1:]:                                   # year-to-date never falls; drop glitches
-                if v >= clean[-1][1]:
-                    clean.append((d, v))
-            out[district][y] = clean
+            out[district][y] = never_falling([(dt.date(y - 1, 12, 31), 0)] + sorted(by_day.items()))
     return out
+
+
+def never_falling(p):
+    """Year-to-date never falls, so drop misread reports: keep the longest run of points that never decreases.
+    (Dropping every point below the highest so far, as before, let one inflated misread wipe out the rest of the
+    year, e.g. Kegalle on 13 Sep 2024.)"""
+    best, prev = [1] * len(p), [-1] * len(p)
+    for i in range(1, len(p)):
+        for j in range(i):
+            if p[j][1] <= p[i][1] and best[j] + 1 > best[i]:
+                best[i], prev[i] = best[j] + 1, j
+    i = max(range(len(p)), key=lambda k: (best[k], k))
+    keep = []
+    while i != -1:
+        keep.append(p[i])
+        i = prev[i]
+    keep = keep[::-1]
+    return keep if keep[0] == p[0] else [p[0]] + [x for x in keep if x[1] >= 0]
 
 
 class Cases:
@@ -296,16 +309,21 @@ def live_assess(d, w, lead, officer):
         return None
     c = officer.get(w)
     if c is not None:
-        return _live_record(d, w, lead, a, c, at=w, officer=True)
-    if a["cases_to"]:                                    # public report: judged at the end of its own window
-        return _live_record(d, w, lead, a, a["cases_data_month"], at=dt.date.fromisoformat(a["cases_to"]), officer=False)
-    return _live_record(d, w, lead, a, None, at=w, officer=False)
+        rec = _live_record(d, w, lead, a, c, at=w, officer=True)
+    elif a["cases_to"]:                                  # public report: judged at the end of its own window
+        rec = _live_record(d, w, lead, a, a["cases_data_month"], at=dt.date.fromisoformat(a["cases_to"]), officer=False)
+    else:
+        rec = _live_record(d, w, lead, a, None, at=w, officer=False)
+    # what an officer's count for the 28 days to w would be judged against, so a static copy of the dashboard
+    # (scripts/export_static.py) can apply the same rule in the browser
+    normal, expected, low = _normals(d, w, lead, at=w)
+    return rec | {"officer_normal": normal, "officer_expected": round(expected, 1) if expected else None,
+                  "officer_low": low, "officer_cases_for_warning": cases_for_warning(normal)}
 
 
-def _live_record(d, w, lead, a, c, at, officer):
-    """Live record for case count c over the 28 days to `at` (w for an officer's count, the report's own end date for
-    a public report). If the 52-week level at `at` is missing (e.g. a report missing at a year end), the latest one
-    within two years is used and the outlook is marked low confidence."""
+def _normals(d, w, lead, at):
+    """Normal for the 28 days to `at` and for the target window, from the 52-week level at `at`. If that level is
+    missing (e.g. a report missing at a year end), the latest one within two years is used: low confidence."""
     lv, low = d.level(at), False
     if lv is None:
         for back in range(1, 105):
@@ -314,8 +332,13 @@ def _live_record(d, w, lead, a, c, at, officer):
                 low = True
                 break
     si_now, si_t = d.seasonal(at, at), d.seasonal(w + dt.timedelta(WINDOW * lead), at)
-    normal = lv * si_now if lv and si_now else None
-    expected = lv * si_t if lv and si_t else None
+    return (lv * si_now if lv and si_now else None), (lv * si_t if lv and si_t else None), low
+
+
+def _live_record(d, w, lead, a, c, at, officer):
+    """Live record for case count c over the 28 days to `at` (w for an officer's count, the report's own end date for
+    a public report)."""
+    normal, expected, low = _normals(d, w, lead, at)
     case_signal = None if c is None or normal is None else c > normal
     return a | {"cases_data_month": c, "cases_normal": round(normal, 1) if normal else None,
                 "expected": round(expected, 1) if expected else None, "case_signal": case_signal,

@@ -8,49 +8,32 @@
    "season": false
   },
   "dev": {
-   "alerts": 233,
-   "correct": 153,
-   "precision": 0.657,
-   "recall": 0.15,
-   "lift": 1.4
+   "alerts": 448,
+   "correct": 294,
+   "precision": 0.656,
+   "recall": 0.187,
+   "lift": 1.37
   }
  },
- "eligible": 17,
+ "eligible": 16,
  "chosen": {
   "rule": {
-   "R": 56,
+   "R": 84,
    "e": 0,
-   "k": 1.4,
-   "trend": false,
+   "k": 1.2,
+   "trend": true,
    "season": false
   },
-  "name": "rain 8 weeks > usual + 0, cases > 1.4 x usual",
+  "name": "rain 12 weeks > usual + 0, cases > 1.2 x usual, rising",
   "dev": {
-   "alerts": 233,
-   "correct": 153,
+   "alerts": 385,
+   "correct": 253,
    "precision": 0.657,
-   "recall": 0.15,
-   "lift": 1.4
+   "recall": 0.161,
+   "lift": 1.37
   }
  },
  "top": [
-  {
-   "rule": {
-    "R": 56,
-    "e": 0,
-    "k": 1.4,
-    "trend": false,
-    "season": false
-   },
-   "name": "rain 8 weeks > usual + 0, cases > 1.4 x usual",
-   "dev": {
-    "alerts": 233,
-    "correct": 153,
-    "precision": 0.657,
-    "recall": 0.15,
-    "lift": 1.4
-   }
-  },
   {
    "rule": {
     "R": 84,
@@ -61,11 +44,45 @@
    },
    "name": "rain 12 weeks > usual + 0, cases > 1.2 x usual, rising",
    "dev": {
-    "alerts": 201,
-    "correct": 132,
+    "alerts": 385,
+    "correct": 253,
     "precision": 0.657,
-    "recall": 0.129,
-    "lift": 1.4
+    "recall": 0.161,
+    "lift": 1.37
+   }
+  },
+  {
+   "rule": {
+    "R": 56,
+    "e": 0,
+    "k": 1.4,
+    "trend": false,
+    "season": false
+   },
+   "name": "rain 8 weeks > usual + 0, cases > 1.4 x usual",
+   "dev": {
+    "alerts": 448,
+    "correct": 294,
+    "precision": 0.656,
+    "recall": 0.187,
+    "lift": 1.37
+   }
+  },
+  {
+   "rule": {
+    "R": 28,
+    "e": 0,
+    "k": 1.4,
+    "trend": false,
+    "season": false
+   },
+   "name": "rain 4 weeks > usual + 0, cases > 1.4 x usual",
+   "dev": {
+    "alerts": 401,
+    "correct": 262,
+    "precision": 0.653,
+    "recall": 0.167,
+    "lift": 1.36
    }
   },
   {
@@ -78,11 +95,11 @@
    },
    "name": "rain 8 weeks > usual + 0, cases > 1.2 x usual",
    "dev": {
-    "alerts": 274,
-    "correct": 179,
-    "precision": 0.653,
-    "recall": 0.175,
-    "lift": 1.39
+    "alerts": 531,
+    "correct": 346,
+    "precision": 0.652,
+    "recall": 0.22,
+    "lift": 1.36
    }
   },
   {
@@ -95,11 +112,11 @@
    },
    "name": "rain 8 weeks > usual + 0, cases > 1.0 x usual",
    "dev": {
-    "alerts": 332,
-    "correct": 216,
-    "precision": 0.651,
-    "recall": 0.212,
-    "lift": 1.38
+    "alerts": 636,
+    "correct": 413,
+    "precision": 0.649,
+    "recall": 0.263,
+    "lift": 1.35
    }
   },
   {
@@ -112,79 +129,11 @@
    },
    "name": "rain 12 weeks > usual + 0, cases > 1.0 x usual, rising",
    "dev": {
-    "alerts": 229,
-    "correct": 149,
-    "precision": 0.651,
-    "recall": 0.146,
-    "lift": 1.38
-   }
-  },
-  {
-   "rule": {
-    "R": 56,
-    "e": 0,
-    "k": 1.0,
-    "trend": true,
-    "season": false
-   },
-   "name": "rain 8 weeks > usual + 0, cases > 1.0 x usual, rising",
-   "dev": {
-    "alerts": 214,
-    "correct": 139,
-    "precision": 0.65,
-    "recall": 0.136,
-    "lift": 1.38
-   }
-  },
-  {
-   "rule": {
-    "R": 84,
-    "e": 0,
-    "k": 1.4,
-    "trend": false,
-    "season": false
-   },
-   "name": "rain 12 weeks > usual + 0, cases > 1.4 x usual",
-   "dev": {
-    "alerts": 257,
-    "correct": 166,
-    "precision": 0.646,
-    "recall": 0.163,
-    "lift": 1.37
-   }
-  },
-  {
-   "rule": {
-    "R": 56,
-    "e": 3,
-    "k": 1.0,
-    "trend": false,
-    "season": false
-   },
-   "name": "rain 8 weeks > usual + 3, cases > 1.0 x usual",
-   "dev": {
-    "alerts": 196,
-    "correct": 126,
-    "precision": 0.643,
-    "recall": 0.123,
-    "lift": 1.37
-   }
-  },
-  {
-   "rule": {
-    "R": 84,
-    "e": 0,
-    "k": 1.0,
-    "trend": false,
-    "season": false
-   },
-   "name": "rain 12 weeks > usual + 0, cases > 1.0 x usual",
-   "dev": {
-    "alerts": 360,
-    "correct": 230,
-    "precision": 0.639,
-    "recall": 0.225,
-    "lift": 1.36
+    "alerts": 442,
+    "correct": 287,
+    "precision": 0.649,
+    "recall": 0.183,
+    "lift": 1.35
    }
   },
   {
@@ -197,11 +146,62 @@
    },
    "name": "rain 12 weeks > usual + 0, cases > 1.2 x usual",
    "dev": {
-    "alerts": 301,
-    "correct": 192,
+    "alerts": 587,
+    "correct": 376,
+    "precision": 0.641,
+    "recall": 0.239,
+    "lift": 1.33
+   }
+  },
+  {
+   "rule": {
+    "R": 84,
+    "e": 0,
+    "k": 1.4,
+    "trend": false,
+    "season": false
+   },
+   "name": "rain 12 weeks > usual + 0, cases > 1.4 x usual",
+   "dev": {
+    "alerts": 505,
+    "correct": 323,
+    "precision": 0.64,
+    "recall": 0.206,
+    "lift": 1.33
+   }
+  },
+  {
+   "rule": {
+    "R": 56,
+    "e": 0,
+    "k": 1.0,
+    "trend": true,
+    "season": false
+   },
+   "name": "rain 8 weeks > usual + 0, cases > 1.0 x usual, rising",
+   "dev": {
+    "alerts": 416,
+    "correct": 266,
+    "precision": 0.639,
+    "recall": 0.169,
+    "lift": 1.33
+   }
+  },
+  {
+   "rule": {
+    "R": 56,
+    "e": 3,
+    "k": 1.0,
+    "trend": false,
+    "season": false
+   },
+   "name": "rain 8 weeks > usual + 3, cases > 1.0 x usual",
+   "dev": {
+    "alerts": 384,
+    "correct": 245,
     "precision": 0.638,
-    "recall": 0.188,
-    "lift": 1.36
+    "recall": 0.156,
+    "lift": 1.33
    }
   }
  ]

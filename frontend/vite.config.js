@@ -11,6 +11,7 @@ export default defineConfig({
       "/data": "http://127.0.0.1:8000",
     },
   },
+  base: "./",                     // relative asset paths: the same build works at / and on GitHub Pages
   build: {
     outDir: "../web",
     emptyOutDir: true,

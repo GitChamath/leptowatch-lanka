@@ -55,6 +55,21 @@ compare the current rule with itself). Weeks 5–8 keep the same rule as the nex
 always show the same colour; only how often each was right differs. The dashboard now shows them as one
 8-week outlook, scored for weeks 1–4 and weeks 5–8.
 
+## Re-run after the data-cleaning fix (9 November 2026)
+
+A bug in how misread reports were dropped (README, "Data-cleaning fix") was fixed, and the same selection was
+re-run unchanged on the cleaned data. This time one rule led on development years: rain over 12 weeks above usual,
+cases above 1.2 × usual and rising, at 65.7% (385 Warnings) against the current rule's 65.6% (448). As fixed above,
+it then had its one held-out run (`python research/weekly_lead2.py heldout`, `data/weekly_lead2.json`):
+
+| Held-out 2018+, weeks 5–8 | Current rule | Chosen rule |
+|---|---|---|
+| Officer counts | **67.4%** (1,032 of 1,531) | 66.4% (864 of 1,302) |
+| Public reports only | **63.4%** (806 of 1,271) | 62.8% (703 of 1,119) |
+
+It lost in both, so it was **not adopted**. Weeks 5–8 keep the same rule, and the dashboard keeps one 8-week
+outlook.
+
 ## Declared
 
 Held-out years 2018 onwards have been scored before (rounds 1 and 2, and the public-delay correction). This is

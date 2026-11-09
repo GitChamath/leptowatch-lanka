@@ -5,8 +5,12 @@ import { t } from "../i18n.js";
 
 const pc = (x) => `${Math.round(x * 100)}%`;
 const pct = (x) => (x == null ? "—" : Math.round(x * 100));
-/** The case count that would turn this Watch into a Warning: rain must be up, and cases above 1.4 x normal. */
-const smallest = (c) => (c && c.level === "watch" && c.rain_signal && c.cases_for_warning != null ? c.cases_for_warning : null);
+/** The count for the 4 weeks to the decision day that would make this a Warning: rain must be up, and cases above
+ * 1.4 x the normal for those 4 weeks (officer_cases_for_warning; a public report's own normal is for older weeks). */
+const smallest = (c) => {
+  const n = c?.officer ? c.cases_for_warning : c?.officer_cases_for_warning ?? c?.cases_for_warning;
+  return c && c.level === "watch" && c.rain_signal && n != null ? n : null;
+};
 
 /** Weekly rolling outlook for one district: one alert for the next 8 weeks, why, and the 4-week case count box. */
 export default function WeeklyCard({ name, w, model, evaluation, onSave }) {

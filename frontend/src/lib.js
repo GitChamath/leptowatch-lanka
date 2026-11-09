@@ -162,7 +162,58 @@ export function centroidOf(geom) {
 }
 
 /* ---------- API ---------- */
+/* The static copy of the dashboard (scripts/export_static.py, published to GitHub Pages) sets window.LW_STATIC and
+ * serves each API answer as a JSON file. There, an officer's weekly count is applied in the browser with the same
+ * rule as lw/weekly.py (level_of), using the normal the server pre-computed for a count entered today
+ * (officer_normal); nothing is saved. */
+const STATIC = typeof window !== "undefined" && !!window.LW_STATIC;
+let staticWeekly = null;
+
+function staticPath(url) {
+  const [p, q] = url.split("?");
+  if (p.startsWith("/api/district/")) return `api/district/${p.slice("/api/district/".length)}.json`;
+  if (p === "/api/replay") {
+    const s = new URLSearchParams(q);
+    return `api/replay/${s.get("month")}-${s.get("lag")}.json`;
+  }
+  if (p.startsWith("/api/")) return `${p.slice(1)}.json`;
+  return p.slice(1);
+}
+
+const plusDays = (iso, n) => { const d = new Date(`${iso}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+
+function officerCount(body) {
+  const [name, end, value] = body.split(",").map((x) => x.trim());
+  const d = staticWeekly?.districts?.[name];
+  const c = Number(value);
+  if (!d || !/^\d+$/.test(value)) throw new Error("Could not read that count.");
+  for (const lead of ["1", "2"]) {
+    const r = d[lead];
+    if (!r || r.decided !== end) continue;
+    const n = r.officer_normal;
+    const up = n != null && c > n;
+    const level = r.rain_signal && up && c > 1.4 * n ? "warning" : r.rain_signal || up ? "watch" : "normal";
+    d[lead] = { ...r, cases_data_month: c, case_signal: n == null ? null : up, level,
+      cases_normal: n == null ? null : Math.round(n * 10) / 10, expected: r.officer_expected,
+      cases_for_warning: r.officer_cases_for_warning ?? null, low_confidence: r.officer_low,
+      cases_to: end, officer: true, window_from: plusDays(end, -27) };
+  }
+  return { saved: 1 };
+}
+
 export async function api(url, opts) {
+  if (STATIC) {
+    if (opts?.method === "POST") {
+      if (url === "/api/weekly_cases") return officerCount(opts.body);
+      throw new Error("Monthly counts need the local server (python scripts/serve.py).");
+    }
+    if (url === "/api/weekly" && staticWeekly) return structuredClone(staticWeekly);
+    const r = await fetch(staticPath(url));
+    if (!r.ok) throw new Error(r.statusText);
+    const body = await r.json();
+    if (url === "/api/weekly") { staticWeekly = body; return structuredClone(body); }
+    return body;
+  }
   const r = await fetch(url, opts);
   const body = await r.json();
   if (!r.ok) throw new Error(body.error || r.statusText);

@@ -1,5 +1,8 @@
 # LeptoWatch Lanka
 
+**Live demo:** https://gitchamath.github.io/leptowatch-lanka/ (nothing to install; case counts typed there stay in
+your browser and are not saved).
+
 A district-level leptospirosis early warning for Sri Lanka. Every Saturday it combines rain over the last
 8 weeks with cases over the last 4 weeks, and gives a district health officer one alert for the next 8 weeks:
 how likely they are to be **worse than a normal season** for that district. The alert is scored separately
@@ -9,16 +12,21 @@ against weeks 1–4 and weeks 5–8.
   **Normal**: neither. **Needs case count**: wetter than usual but no recent case count, so the officer is asked
   to enter one.
 - On 2018 onwards, held out while the rules were chosen on 2011–2017, a Warning was followed by more cases than
-  usual **72%** of the time in weeks 1 to 4 and **66%** in weeks 5 to 8 when the officer entered an
-  up-to-date count, and **66%** and **61%** using public reports alone, which go online about 8 weeks late.
-  By chance it would be 54%. Details under [How good it is](#how-good-it-is).
+  usual **74%** of the time in weeks 1 to 4 and **67%** in weeks 5 to 8 when the officer entered an
+  up-to-date count, and **66%** and **63%** using public reports alone, which go online about 8 weeks late.
+  By chance it would be 56%. Details under [How good it is](#how-good-it-is).
+- **A real outbreak, replayed.** In December 2024 leptospirosis killed at least five people in Jaffna after the
+  monsoon floods. Replayed on only the data available each Saturday, with the officer's own counts, Jaffna was on
+  Warning from 2 November, about six weeks before cases peaked ([case study](research/case_jaffna_2024.md)).
+- **Tested before trusted.** Every rule and every new idea was written down before its test
+  (`research/PREREG_*.md`); the ideas that failed are reported too, and so is a data-cleaning bug we found and fixed.
 - The dashboard is in English, Sinhala and Tamil. It also keeps the earlier monthly outlook ("Past seasons").
 
-![Map of Sri Lanka's 25 districts with the weekly outlook; Mannar is selected and shows a Warning](docs/screenshots/map.png)
+![Map of Sri Lanka's 25 districts with the weekly outlook; Vavuniya is selected and shows a Warning](docs/screenshots/map.png)
 
 | District report | Same map in Sinhala |
 |---|---|
-| ![Mannar district report: rain and cases against usual, a box for the officer's own count, and what to do](docs/screenshots/district.png) | ![The map and Mannar card in Sinhala](docs/screenshots/map-sinhala.png) |
+| ![Vavuniya district report: rain and cases against usual, a box for the officer's own count, and what to do](docs/screenshots/district.png) | ![The map and Vavuniya card in Sinhala](docs/screenshots/map-sinhala.png) |
 
 *Outlook decided 7 November 2026. Without officer counts it uses the latest public report (4 weeks to 20 September).*
 
@@ -41,6 +49,9 @@ For the weekly outlook, `python -c "from lw import openmeteo; openmeteo.collect(
 `python scripts/build_weekly.py` rebuilds it. `.github/workflows/update.yml` runs all of this every Sunday and
 commits the refreshed snapshot.
 `python -m unittest discover -s tests` runs the tests.
+`python scripts/export_static.py site` writes a static copy of the dashboard (every API answer as a JSON file; an
+officer's weekly count is applied in the browser with the same rule, using the normal the server pre-computed, and
+not saved). `.github/workflows/pages.yml` publishes it to GitHub Pages on every push and after each weekly update.
 
 The dashboard is a React app (Vite + Framer Motion) in `frontend/`. The built files are committed in `web/`,
 so Node is only needed to change the UI:
@@ -174,7 +185,8 @@ reports (`scripts/backfill_weekly.py`, snapshot in `data/seed/wer_weekly_archive
 | Case signal alone | 66% | 60% |
 
 About the same skill as the monthly outlook, but available when it matters. The weekly risk percentage failed its
-calibration check at both leads (AUC 0.65 and 0.55), so the weekly view shows no percentage and no High priority.
+calibration check at both leads on this data (AUC 0.65 and 0.55), so the weekly view showed no percentage. After the
+data-cleaning fix below, the same check (unchanged) passed; see "Weekly risk percentage" there.
 Weekly decisions overlap, so neighbouring ones are strongly correlated; significance is not claimed. A unit test
 caught and fixed a look-ahead leak (interpolating to the decision day used the next, unpublished report).
 
@@ -194,9 +206,10 @@ rain over the **last 8 weeks** and needs cases **above 1.4 × usual** for a Warn
 
 It beat the old rule at both leads, as the pre-registered adoption test required, so `lw/weekly.py` now uses it. The
 trade is real: Warnings are right more often but fire about a quarter less, so they catch fewer bad periods. Built into
-the engine, which skips the few decisions without a full 8 weeks of rain history, the live numbers are 71.7%
-(893 of 1,245) and 66.4% (834 of 1,256); the site shows 72% and 66%. Held-out years had already been seen once for the
-old rule, so this is a second look at them, with the choice made on development years only.
+the engine, which skips the few decisions without a full 8 weeks of rain history, the numbers were 71.7%
+(893 of 1,245) and 66.4% (834 of 1,256). Held-out years had already been seen once for the old rule, so this is a
+second look at them, with the choice made on development years only. (These figures predate the data-cleaning fix
+below; the current ones are in the next table.)
 
 **How late public case reports really are (correction, 9 November 2026).** The back-test above treats each Weekly
 Epidemiological Report as known on the last day of the week it covers. That matches an officer entering their own
@@ -206,22 +219,40 @@ the 158 reports from 2023–2026 that have one, upload came a median 57 days aft
 measurement, not from the scores), and `scripts/build_weekly.py` also scores the same rule using only reports that
 would already have been online (`heldout_public` in `data/weekly_state.json`):
 
-| Held-out 2018+, Warning right when it fires | Next 4 weeks | Weeks 5–8 |
+| Held-out 2018+, Warning right when it fires | Weeks 1–4 | Weeks 5–8 |
 |---|---|---|
-| Officer's up-to-date count (as above) | **71.7%** (893 of 1,245) | **66.4%** (834 of 1,256) |
-| Public reports only, 8 weeks late | **66.0%** (699 of 1,059) | **61.0%** (659 of 1,080) |
-| Windows worse than normal anyway | 54% | 54% |
+| Officer's up-to-date count | **74.0%** (1,120 of 1,513) | **67.4%** (1,032 of 1,531) |
+| Public reports only, 8 weeks late | **65.7%** (828 of 1,261) | **63.4%** (806 of 1,271) |
+| Windows worse than normal anyway | 55.5% | 55.9% |
 
-The site now shows both. The rule itself is unchanged. Two changes to live use follow from this:
+These are the current figures, after the data-cleaning fix below (before it: 71.7% / 66.4% and 66.0% / 61.0%
+against 54%). The site shows both rows. The rule itself is unchanged. Two changes to live use follow from this:
 
 - *Live outlook uses the latest public report when it is under 9 weeks old* (`PUBLIC_DELAY` + 7 days), exactly as the
   public-only back-test does; before, it only used a report from the last 7 days, which public reports never are, so
   without an officer count every district fell back to rain alone. An officer's count still replaces it.
 - *A Watch with no case count at all is shown as "Needs case count"*, not as Watch. Looked at after the fact on
-  held-out years, a rain-only Watch with no case count was right 56% of the time against 54% by chance, so it should
-  not look like an alert. This changes only the display; Warning, Watch and Normal and their scores are unchanged.
-  (Rain up with cases known and not up was right 46.5%, below chance, but changing the rule for that would be a
-  choice made on held-out years, so it was not done.)
+  held-out years, a rain-only Watch with no case count was right 54.5% of the time (209 decisions) against 55.5% by
+  chance, so it should not look like an alert. This changes only the display; Warning, Watch and Normal and their
+  scores are unchanged. (Rain up with cases known and not up was right 47.3%, below chance, but changing the rule for
+  that would be a choice made on held-out years, so it was not done.)
+
+**Data-cleaning fix (9 November 2026).** Year-to-date counts never fall, so the weekly engine drops misread
+reports. It used to drop every point below the highest one so far, so a single inflated misread (Kegalle read as
+1,418 on 13 September 2024, against 974 by 20 December) wiped out the rest of that district's year: 1,187 of 22,830
+report points were lost, mostly in 2014 and 2023–2025, and Kegalle and Ampara had no usual level at all.
+`weekly.never_falling` now keeps the longest run of points that never falls, so a misread drops only itself
+(450 points dropped; unit test `test_one_misread_report_drops_only_itself`). The rules were not changed; every weekly
+figure above was recomputed on the cleaned data, which adds about 770 judged held-out decisions per distance. The
+Jaffna replay below is unchanged. The monthly outlook ("Past seasons") uses its own monthly series and is not affected.
+
+*Weekly risk percentage, after the fix.* The weekly logistic regression (trained on 2011–2015, recalibrated on
+2016–2017) now passes the calibration check that was fixed in advance, at both distances: Brier 0.233 against 0.253
+for the base rate (weeks 1–4) and 0.247 against 0.253 (weeks 5–8), with every 10-point band holding at least 30
+decisions within 10 points of what happened. It passes narrowly: it under-predicts the middle bands by up to about
+9 points, and its ranking skill is modest (AUC 0.66 and 0.58). Following the check, the dashboard now shows the
+percentage for weeks 1–4 and marks **High priority** Warnings (top 10% of 2011–2017 risk): on held-out years those
+were right 74.5% of the time (626 of 840) against 55.5%. Recorded under `ml` in `data/weekly_state.json`.
 
 **Three more ideas, not adopted.** Same method each time: explore on 2011–2017, fix the choice in writing, run 2018+ once.
 
@@ -234,9 +265,11 @@ The site now shows both. The rule itself is unchanged. Two changes to live use f
 - *A separate rule for weeks 5–8* (`research/PREREG_weekly_lead2.md`, `research/weekly_lead2.py`). Both outlooks
   come from one rule applied to the same data, so they always show the same colour. 180 candidates (rain over
   4, 8 or 12 weeks at three bars, five case bars, a rising-cases and a rising-season option) were scored on
-  development years. None beat the current rule (65.7%), so it was chosen again, nothing changed, and held-out
-  years were not used. The dashboard therefore shows one 8-week outlook with both scores, not two views that
-  could never differ.
+  development years. Before the data-cleaning fix none beat the current rule, so held-out years were not used.
+  After it, rain over 12 weeks with cases above 1.2 × usual and rising led on development years by 0.1 point
+  (65.7% against 65.6%), so it had its one held-out run: it lost with officer counts (66.4% against 67.4%) and with
+  public reports (62.8% against 63.4%), so it was not adopted (`data/weekly_lead2.json`). The dashboard shows one
+  8-week outlook with both scores, not two views that could never differ.
 
 With these sources, rain plus a clear rise in cases looks close to the ceiling.
 
@@ -307,7 +340,10 @@ during the competition period. We own what is submitted here.
   normal, so about half of all months qualify (53% base rate). That is the right target for "is this season
   turning" but it is not an outbreak threshold, and a 71% hit rate should be read against 53%, not against zero.
 - Public case reports go online about 8 weeks late, so without an officer's count the weekly outlook uses a
-  report up to 9 weeks old (with nothing that recent, a wetter-than-usual district shows "Needs case count"), and Warnings are right less often (66% / 61% instead of 72% / 66%).
+  report up to 9 weeks old (with nothing that recent, a wetter-than-usual district shows "Needs case count"), and Warnings are right less often (66% / 63% instead of 74% / 67%).
+- Where a district usually has no cases at all at this time of year (its usual is 0, e.g. Mannar, Kilinochchi
+  and Mullaitivu in November), "usual" is treated as unknown, in the back-test and live, so a count there cannot
+  make a Warning. A better small-number rule would need its own pre-registered test.
   Officers can enter current counts on the dashboard (or via `POST /api/cases`, which has no login yet and
   listens on 127.0.0.1 only) to get up-to-date outlooks.
 - When recent case history is missing, the live outlook estimates "normal" from the most recent 12 months
@@ -326,7 +362,7 @@ during the competition period. We own what is submitted here.
 lw/          collectors (wer.py, chirps.py, openmeteo.py), store, monthly series, engine, weekly outlook
              (weekly.py), risk model (ml.py), server
 scripts/     seed, update, build_state, build_weekly, backfill_weekly, compare_models, export_seed,
-             export_dataset, serve
+             export_dataset, export_static (GitHub Pages copy), serve
 frontend/    React dashboard source (home, map, district report, How it works, past-season replay)
 web/         built dashboard served by lw/server.py
 tests/       parser and engine tests

@@ -1,0 +1,285 @@
+{
+ "rule": {
+  "R": 84,
+  "e": 0,
+  "k": 1.2,
+  "trend": true,
+  "season": false
+ },
+ "name": "rain 12 weeks > usual + 0, cases > 1.2 x usual, rising",
+ "results": {
+  "officer": {
+   "current": {
+    "dev": {
+     "months": 3267,
+     "base_rate": 0.481,
+     "warning": {
+      "alerts": 448,
+      "correct": 294,
+      "precision": 0.656,
+      "recall": 0.187,
+      "lift": 1.37
+     },
+     "any_alert": {
+      "alerts": 2181,
+      "correct": 1210,
+      "precision": 0.555,
+      "recall": 0.771,
+      "lift": 1.15
+     },
+     "rain_only_rule": {
+      "alerts": 1625,
+      "correct": 962,
+      "precision": 0.592,
+      "recall": 0.613,
+      "lift": 1.23
+     },
+     "cases_only_rule": {
+      "alerts": 1192,
+      "correct": 661,
+      "precision": 0.555,
+      "recall": 0.421,
+      "lift": 1.15
+     }
+    },
+    "heldout": {
+     "months": 6441,
+     "base_rate": 0.559,
+     "warning": {
+      "alerts": 1531,
+      "correct": 1032,
+      "precision": 0.674,
+      "recall": 0.287,
+      "lift": 1.21
+     },
+     "any_alert": {
+      "alerts": 5233,
+      "correct": 3068,
+      "precision": 0.586,
+      "recall": 0.852,
+      "lift": 1.05
+     },
+     "rain_only_rule": {
+      "alerts": 4150,
+      "correct": 2471,
+      "precision": 0.595,
+      "recall": 0.687,
+      "lift": 1.07
+     },
+     "cases_only_rule": {
+      "alerts": 3430,
+      "correct": 2118,
+      "precision": 0.617,
+      "recall": 0.588,
+      "lift": 1.11
+     }
+    }
+   },
+   "chosen": {
+    "dev": {
+     "months": 3267,
+     "base_rate": 0.481,
+     "warning": {
+      "alerts": 385,
+      "correct": 253,
+      "precision": 0.657,
+      "recall": 0.161,
+      "lift": 1.37
+     },
+     "any_alert": {
+      "alerts": 2174,
+      "correct": 1184,
+      "precision": 0.545,
+      "recall": 0.754,
+      "lift": 1.13
+     },
+     "rain_only_rule": {
+      "alerts": 1676,
+      "correct": 965,
+      "precision": 0.576,
+      "recall": 0.615,
+      "lift": 1.2
+     },
+     "cases_only_rule": {
+      "alerts": 1192,
+      "correct": 661,
+      "precision": 0.555,
+      "recall": 0.421,
+      "lift": 1.15
+     }
+    },
+    "heldout": {
+     "months": 6441,
+     "base_rate": 0.559,
+     "warning": {
+      "alerts": 1302,
+      "correct": 864,
+      "precision": 0.664,
+      "recall": 0.24,
+      "lift": 1.19
+     },
+     "any_alert": {
+      "alerts": 5323,
+      "correct": 3066,
+      "precision": 0.576,
+      "recall": 0.852,
+      "lift": 1.03
+     },
+     "rain_only_rule": {
+      "alerts": 4399,
+      "correct": 2531,
+      "precision": 0.575,
+      "recall": 0.703,
+      "lift": 1.03
+     },
+     "cases_only_rule": {
+      "alerts": 3430,
+      "correct": 2118,
+      "precision": 0.617,
+      "recall": 0.588,
+      "lift": 1.11
+     }
+    }
+   }
+  },
+  "differs_from_next_4_weeks": {
+   "decisions": 11750,
+   "different_colour": 2169
+  },
+  "public": {
+   "current": {
+    "dev": {
+     "months": 3074,
+     "base_rate": 0.468,
+     "warning": {
+      "alerts": 286,
+      "correct": 199,
+      "precision": 0.696,
+      "recall": 0.138,
+      "lift": 1.49
+     },
+     "any_alert": {
+      "alerts": 2017,
+      "correct": 1094,
+      "precision": 0.542,
+      "recall": 0.76,
+      "lift": 1.16
+     },
+     "rain_only_rule": {
+      "alerts": 1534,
+      "correct": 886,
+      "precision": 0.578,
+      "recall": 0.615,
+      "lift": 1.23
+     },
+     "cases_only_rule": {
+      "alerts": 923,
+      "correct": 496,
+      "precision": 0.537,
+      "recall": 0.344,
+      "lift": 1.15
+     }
+    },
+    "heldout": {
+     "months": 6317,
+     "base_rate": 0.56,
+     "warning": {
+      "alerts": 1271,
+      "correct": 806,
+      "precision": 0.634,
+      "recall": 0.228,
+      "lift": 1.13
+     },
+     "any_alert": {
+      "alerts": 5443,
+      "correct": 3173,
+      "precision": 0.583,
+      "recall": 0.897,
+      "lift": 1.04
+     },
+     "rain_only_rule": {
+      "alerts": 4137,
+      "correct": 2425,
+      "precision": 0.586,
+      "recall": 0.685,
+      "lift": 1.05
+     },
+     "cases_only_rule": {
+      "alerts": 3352,
+      "correct": 2026,
+      "precision": 0.604,
+      "recall": 0.573,
+      "lift": 1.08
+     }
+    }
+   },
+   "chosen": {
+    "dev": {
+     "months": 3074,
+     "base_rate": 0.468,
+     "warning": {
+      "alerts": 210,
+      "correct": 127,
+      "precision": 0.605,
+      "recall": 0.088,
+      "lift": 1.29
+     },
+     "any_alert": {
+      "alerts": 2050,
+      "correct": 1104,
+      "precision": 0.539,
+      "recall": 0.767,
+      "lift": 1.15
+     },
+     "rain_only_rule": {
+      "alerts": 1556,
+      "correct": 878,
+      "precision": 0.564,
+      "recall": 0.61,
+      "lift": 1.2
+     },
+     "cases_only_rule": {
+      "alerts": 923,
+      "correct": 496,
+      "precision": 0.537,
+      "recall": 0.344,
+      "lift": 1.15
+     }
+    },
+    "heldout": {
+     "months": 6317,
+     "base_rate": 0.56,
+     "warning": {
+      "alerts": 1119,
+      "correct": 703,
+      "precision": 0.628,
+      "recall": 0.199,
+      "lift": 1.12
+     },
+     "any_alert": {
+      "alerts": 5496,
+      "correct": 3166,
+      "precision": 0.576,
+      "recall": 0.895,
+      "lift": 1.03
+     },
+     "rain_only_rule": {
+      "alerts": 4378,
+      "correct": 2513,
+      "precision": 0.574,
+      "recall": 0.71,
+      "lift": 1.02
+     },
+     "cases_only_rule": {
+      "alerts": 3352,
+      "correct": 2026,
+      "precision": 0.604,
+      "recall": 0.573,
+      "lift": 1.08
+     }
+    }
+   }
+  }
+ },
+ "adopted": false
+}

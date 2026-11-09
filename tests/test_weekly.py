@@ -85,6 +85,11 @@ class Engine(unittest.TestCase):
         for k in ("level", "case_signal", "cases_data_month", "cases_to"):
             self.assertEqual(before[k], after[k])
 
+    def test_one_misread_report_drops_only_itself(self):
+        p = [(D(2023, 12, 31), 0), (D(2024, 1, 7), 5), (D(2024, 1, 14), 9), (D(2024, 1, 21), 900),
+             (D(2024, 1, 28), 12), (D(2024, 2, 4), 15), (D(2024, 2, 11), 3), (D(2024, 2, 18), 20)]
+        self.assertEqual([v for _, v in weekly.never_falling(p)], [0, 5, 9, 12, 15, 20])
+
     def test_live_uses_recent_public_report_and_officer_count_wins(self):
         d = self.district()
         d.cases.years[2020] = [p for p in d.cases.years[2020] if p[0] <= D(2020, 5, 1)]   # last report 5 weeks old
@@ -98,6 +103,12 @@ class Engine(unittest.TestCase):
         self.assertTrue(own["officer"])
         self.assertEqual((own["cases_data_month"], own["cases_to"]), (500, w.isoformat()))
         self.assertEqual(own["level"], "watch")                          # cases far above normal, rain usual
+        # the static dashboard applies the rule in the browser with officer_normal: it must give the same answer
+        for c in (0, 1, 3, 10, 500):
+            rec = weekly.live_assess(d, w, 1, {w: c})
+            self.assertEqual(weekly.level_of(public["rain_signal"], c, public["officer_normal"]), rec["level"])
+            self.assertEqual(public["officer_normal"] and round(public["officer_normal"], 1), rec["cases_normal"])
+            self.assertEqual(public["officer_cases_for_warning"], rec["cases_for_warning"])
 
 
 if __name__ == "__main__":

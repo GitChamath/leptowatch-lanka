@@ -7,3 +7,4 @@ frontend/node_modules/
 frontend/dist/
 data/weekly.sqlite
 data/cache_*.log
+site/
