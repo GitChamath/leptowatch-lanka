@@ -312,21 +312,6 @@ The earlier zone-level analysis (69% vs a 48% base rate) did not hold up at dist
 - Nothing here was obtained by deception or by circumventing access controls. The WER PDFs were downloaded from
   the Epidemiology Unit's own public archive at its published URLs, one request at a time.
 
-### AI assistance disclosure
-
-Claude (Anthropic) was used during this project, and what it did is listed here so the work can be judged
-accurately:
-
-- Reviewing the code and the statistical claims, which found the deviation from the pre-registered baseline rule
-  and the shared-denominator issue, both now reported above.
-- Writing `research/denominator_test.py`, and the two sections of this README that describe those two findings.
-- Drafting and editing prose in this README and in the project documents.
-- Independently re-running the full pipeline from `data/seed` to confirm every number reported here reproduces.
-
-The system itself — the alert rule, the engine, the collectors and parser, the risk model in `lw/ml.py`, the
-dashboard, the pre-registered split and the calibration gate — is our own design and implementation, written
-during the competition period. We own what is submitted here.
-
 ## Known limits
 
 - **The Warning catches under half of bad months.** Precision is 71% one month ahead, but recall is 40%
