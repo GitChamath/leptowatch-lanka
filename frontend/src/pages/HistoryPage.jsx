@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import MapView from "../components/MapView.jsx";
 import Panel from "../components/Panel.jsx";
 import { Segmented } from "../components/bits.jsx";
@@ -56,7 +56,7 @@ export default function HistoryPage({ summary, geo }) {
         <Counts tally={tally} />
       </div>
       <main className="layout">
-        <motion.section className="mapcard" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
+        <motion.section className="mapcard pop-in">
           <Legend />
           <div className="map-area">
             <MapView geo={geo} levelOf={levelOf} selected={selected} onSelect={setSelected} />
@@ -71,11 +71,7 @@ export default function HistoryPage({ summary, geo }) {
                   {[...new Set(months.map((m) => m.slice(0, 4)))].filter((_, i) => i % 2 === 0).map((y) => <span key={y}>{y}</span>)}
                 </div>
               </div>
-              <AnimatePresence mode="popLayout" initial={false}>
-                <motion.div key={monthKey} className="month-label" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -10, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  {fmt(monthKey)}
-                </motion.div>
-              </AnimatePresence>
+              <div key={monthKey} className="month-label rise">{fmt(monthKey)}</div>
             </div>
           </div>
           <Panel selected={selected} mode="past" lag={lag} past={past} monthKey={monthKey} tally={tally}

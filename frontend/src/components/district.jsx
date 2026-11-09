@@ -1,43 +1,19 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { LEVEL, fmt, whenLabel } from "../lib.js";
+import { LEVEL, fmt } from "../lib.js";
 import { LANGS, farmerMessage, getLang, smsParts, staffSms, t } from "../i18n.js";
 import { RecordRing } from "./bits.jsx";
 
-export const MIN_TIMES = 10; // fewer past alerts than this is too few to judge a district's record
+const MIN_TIMES = 10; // fewer past alerts than this is too few to judge a district's record
 
 /** Plain-language record for one alert level: "right 27 of 56 times", or a too-few note. */
-export function recordLine(rec, level, short) {
+function recordLine(rec, level, short) {
   if (!rec || level === "nodata") return null;
   const noun = t(`noun_${level}`);
   if (rec.times < MIN_TIMES) return t("rec_few", { noun });
   const pct = Math.round((rec.right / rec.times) * 100);
   return short ? t("rec_short", { right: rec.right, times: rec.times })
     : t("rec_long", { noun, right: rec.right, times: rec.times, pct });
-}
-
-/** Both outlooks side by side; they share the same input month, only the distance ahead differs. */
-export function Horizons({ d, lag, onLag }) {
-  return (
-    <div className="horizons">
-      {["1", "2"].map((L) => {
-        const c = d.current?.[L];
-        const lv = c?.level || "nodata";
-        const line = recordLine(d.records?.[L]?.all?.[lv], lv, true);
-        return (
-          <motion.button key={L} className={`horizon ${L === lag ? "on" : ""}`} onClick={() => onLag(L)}
-            whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }} aria-pressed={L === lag}>
-            <span className="h-when">{fmt(c?.target)}</span>
-            <span className="h-ahead">{c?.target ? whenLabel(c.target) : ""}</span>
-            <motion.span key={lv} className={`h-level ${lv}`} initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-              {LEVEL[lv]}
-            </motion.span>
-            {line && <span className="h-track">{line}</span>}
-          </motion.button>
-        );
-      })}
-    </div>
-  );
 }
 
 /** What the district's past alerts at this level actually did, with counts and periods. */
@@ -60,7 +36,7 @@ export function TrackRecord({ rec, level, base }) {
 export function Check({ text, delay }) {
   const [done, setDone] = useState(false);
   return (
-    <motion.li initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay }}>
+    <li className="slide-in-sm" style={{ animationDelay: `${delay || 0}s` }}>
       <button className={`tick ${done ? "on" : ""}`} aria-pressed={done} aria-label={`Mark done: ${text}`} onClick={() => setDone(!done)}>
         <AnimatePresence>
           {done && (
@@ -72,7 +48,7 @@ export function Check({ text, delay }) {
         </AnimatePresence>
       </button>
       <span className={done ? "struck" : ""}>{text}</span>
-    </motion.li>
+    </li>
   );
 }
 
@@ -96,12 +72,9 @@ export function CountEntry({ month, known, current, toWarning, onSave }) {
           {state.busy ? <span className="spinner" /> : t(known ? "update_btn" : "add_btn")}
         </motion.button>
       </div>
-      <AnimatePresence mode="wait">
-        <motion.p key={state.msg || "hint"} className={`note ${state.error ? "err" : ""}`}
-          initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-          {state.msg || t(known ? "count_used" : "count_hint")}
-        </motion.p>
-      </AnimatePresence>
+      <p key={state.msg || "hint"} className={`note fade-in ${state.error ? "err" : ""}`}>
+        {state.msg || t(known ? "count_used" : "count_hint")}
+      </p>
       {toWarning != null && !state.msg && (
         <p className="to-warning">{t("to_warning", { n: toWarning, month: fmt(month) })}</p>
       )}

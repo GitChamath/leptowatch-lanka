@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { Icon } from "../icons.jsx";
-import { rise, stagger } from "../components/bits.jsx";
 import { t, useLang } from "../i18n.js";
 import { LEVEL, LEVELS, fmt, fmtDay, levelColor, whenLabel } from "../lib.js";
 
@@ -125,8 +124,8 @@ export default function HomePage({ summary, weekly }) {
   };
 
   return (
-    <motion.div className="page home" variants={stagger} initial="hidden" animate="show">
-      <motion.section variants={rise} className="home-hero">
+    <motion.div className="page home stagger">
+      <motion.section className="home-hero rise">
         <div className="home-hero-text">
           <div className="eyebrow">{T.eyebrow}</div>
           <h1>{T.title}</h1>
@@ -171,7 +170,7 @@ export default function HomePage({ summary, weekly }) {
         </aside>
       </motion.section>
 
-      <motion.section variants={rise} className="home-section">
+      <motion.section className="home-section rise">
         <h2>{T.decide}</h2>
         <ol className="home-steps">
           {T.steps.map(([icon, title, text], i) => {
@@ -187,7 +186,7 @@ export default function HomePage({ summary, weekly }) {
         </ol>
       </motion.section>
 
-      <motion.section variants={rise} className="home-section">
+      <motion.section className="home-section rise">
         <h2>{T.colours}</h2>
         <div className="home-levels">
           {["normal", "watch", "warning"].map((l) => (
@@ -199,7 +198,7 @@ export default function HomePage({ summary, weekly }) {
         </div>
       </motion.section>
 
-      <motion.section variants={rise} className="home-section">
+      <motion.section className="home-section rise">
         <h2>{T.use}</h2>
         <ol className="home-use">
           {T.uses.map(([title, text], i) => (
@@ -211,7 +210,7 @@ export default function HomePage({ summary, weekly }) {
         </ol>
       </motion.section>
 
-      <motion.section variants={rise} className="home-section">
+      <motion.section className="home-section rise">
         <h2>{T.know}</h2>
         <ul className="home-know">
           {T.knows.map((k, i) => <li key={i}><Icon.info />{fill(k, nums)}</li>)}

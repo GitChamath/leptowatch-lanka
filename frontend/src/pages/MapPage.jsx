@@ -49,11 +49,11 @@ export function Legend({ soft = false }) {
 }
 
 /** The record behind a map view: weekly ("w1", "w2") or monthly ("1", "2"). */
-export const recordOf = (summary, weekly, view, n) => (view.startsWith("w")
+const recordOf = (summary, weekly, view, n) => (view.startsWith("w")
   ? weekly?.districts?.[n]?.[view.slice(1)] : summary.districts?.[n]?.current?.[view]);
 
 /** Switcher options: weekly first when available, then the two monthly outlooks. */
-export const viewOptions = (summary, weekly) => (weekly
+const viewOptions = (summary, weekly) => (weekly
   ? [["w1", t("wk_next")], ["w2", t("wk_after")]]
   : summary.horizon.map((m, i) => [String(i + 1), `${fmt(m)} · ${whenLabel(m)}`]));
 
@@ -94,7 +94,7 @@ export default function MapPage({ summary, geo, view, onView, weekly, getDistric
         <Counts tally={tally} rainCount={rainCount} />
       </div>
       <main className="layout">
-        <motion.section className="mapcard" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.1 }}>
+        <motion.section className="mapcard pop-in" style={{ animationDelay: "0.1s" }}>
           <Legend soft={soft} />
           <div className="map-area">
             <MapView geo={geo} levelOf={levelOf} softOf={softOf} selected={selected} onSelect={select} />

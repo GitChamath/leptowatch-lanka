@@ -1,29 +1,23 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Icon } from "../icons.jsx";
 import { ACTIONS, LEVEL, LEVELS, LEVEL_MEANING, PROVINCE, WHY, fmt, fmtDay, levelColor, mon, whyText } from "../lib.js";
 import { dname, province, t } from "../i18n.js";
 import { districtHref } from "../router.js";
-import { AnimatedNumber, Delta, Kpi, Rich, Status, rise, stagger } from "./bits.jsx";
+import { AnimatedNumber, Delta, Kpi, Rich, Status } from "./bits.jsx";
 import { WeeklyEntry } from "./weekly.jsx";
 
-const slide = {
-  initial: { opacity: 0, x: 28 },
-  animate: { opacity: 1, x: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
-  exit: { opacity: 0, x: -16, transition: { duration: 0.18 } },
-};
 
 /** The glass card beside the map: the national overview, or a short summary of the clicked district. */
 export default function Panel(props) {
   const { selected, mode, lag, monthKey } = props;
   return (
     <aside className="panel" aria-live="polite">
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div key={`${mode}-${selected || "overview"}-${mode === "past" ? `${lag}-${monthKey}` : lag}`} {...slide}>
-          {!selected ? <Overview {...props} />
-            : mode === "past" ? <PastDistrict {...props} />
-              : <QuickCard {...props} />}
-        </motion.div>
-      </AnimatePresence>
+      {/* CSS slide-in rather than AnimatePresence mode="wait", which could leave the card stuck (see App.jsx) */}
+      <div key={`${mode}-${selected || "overview"}-${mode === "past" ? `${lag}-${monthKey}` : lag}`} className="slide-in">
+        {!selected ? <Overview {...props} />
+          : mode === "past" ? <PastDistrict {...props} />
+            : <QuickCard {...props} />}
+      </div>
     </aside>
   );
 }
@@ -46,15 +40,15 @@ function Header({ name, sub, onClose }) {
 function Overview({ tally, mode, lag, target, rainMonth, attention = [], onPick, weeklyTo }) {
   const past = mode === "past";
   return (
-    <motion.div className="overview" variants={stagger} initial="hidden" animate="show">
-      <motion.div variants={rise} className="eyebrow">{past ? t("past_seasons") : t("outlook")}</motion.div>
-      <motion.h2 variants={rise}>{target}</motion.h2>
-      <motion.p variants={rise}>
+    <motion.div className="overview stagger">
+      <motion.div className="eyebrow rise">{past ? t("past_seasons") : t("outlook")}</motion.div>
+      <motion.h2 className="rise">{target}</motion.h2>
+      <motion.p className="rise">
         {past
           ? t("ov_past", { ahead: t(lag === "1" ? "one_month" : "two_months") })
           : weeklyTo ? t("wk_overview", { date: fmtDay(weeklyTo) }) : t("ov_outlook", { month: fmt(rainMonth) })}
       </motion.p>
-      <motion.div variants={rise} className="ov-grid">
+      <motion.div className="ov-grid rise">
         {LEVELS.map((l) => (
           <motion.div key={l} className="ov" whileHover={{ y: -3 }}>
             <div className="n"><AnimatedNumber value={tally[l]} /></div>
@@ -63,21 +57,21 @@ function Overview({ tally, mode, lag, target, rainMonth, attention = [], onPick,
         ))}
       </motion.div>
       {!past && (
-        <motion.div variants={rise} className="attention">
+        <motion.div className="attention rise">
           <h3>{t("needs_attention")}</h3>
           {attention.length === 0 ? (
             <p className="note">{t("none_attention")}</p>
           ) : (
             <ul>
               {attention.map((a, i) => (
-                <motion.li key={a.name} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + i * 0.03 }}>
+                <li key={a.name} className="slide-in-sm" style={{ animationDelay: `${0.2 + i * 0.03}s` }}>
                   <button onClick={() => onPick(a.name)}>
                     <span className={`att-level ${a.level} ${a.hp ? "hp" : ""} ${a.rain ? "rain" : ""}`}>{a.level === "warning" ? "⚠ " : ""}{a.hp ? t("hp_badge") : LEVEL[a.level]}</span>
                     <span className="att-name">{dname(a.name)}</span>
                     {a.rain && <span className="att-tag">{t("rain_only")}</span>}
                     <span className="att-go" aria-hidden="true">›</span>
                   </button>
-                </motion.li>
+                </li>
               ))}
             </ul>
           )}
@@ -85,7 +79,7 @@ function Overview({ tally, mode, lag, target, rainMonth, attention = [], onPick,
         </motion.div>
       )}
       {past && (
-        <motion.div variants={rise} className="pointer">
+        <motion.div className="pointer rise">
           <motion.span animate={{ x: [0, 4, 0] }} transition={{ duration: 1.6, repeat: Infinity }}><Icon.pointer /></motion.span>
           {t("pick_month")}
         </motion.div>
@@ -104,8 +98,8 @@ function QuickCard({ selected: n, detail: d, lag, onClose, weeklyRec, onSaveWeek
     <>
       <Header name={n} sub={weeklyRec ? t("wk_range", { from: fmtDay(c.target_from), to: fmtDay(c.target_end) })
         : t("outlook_for", { month: fmt(c.target) })} onClose={onClose} />
-      <motion.div variants={stagger} initial="hidden" animate="show">
-        <motion.div variants={rise} className="section">
+      <motion.div className="stagger">
+        <motion.div className="section rise">
           <Status key={lv + lag} level={lv} text={whyText(c)} meaning={LEVEL_MEANING[lv]} />
           <p className={`basis ${known ? "" : "partial"}`}>
             <Rich text={weeklyRec ? t(known ? "wk_basis" : "wk_basis_rain", { date: fmtDay(c.decided) })
@@ -120,19 +114,19 @@ function QuickCard({ selected: n, detail: d, lag, onClose, weeklyRec, onSaveWeek
           )}
         </motion.div>
         {weeklyRec && onSaveWeekly && (
-          <motion.div variants={rise} className="section">
+          <motion.div className="section rise">
             <WeeklyEntry key={`${n}-${c.decided}`} name={n} end={c.decided} c={c} onSave={onSaveWeekly} />
           </motion.div>
         )}
         {ACTIONS[lv].length > 0 && (
-          <motion.div variants={rise} className="section">
+          <motion.div className="section rise">
             <h3>{t("what_to_do")}</h3>
             <ul className="quick-actions">
               {ACTIONS[lv].slice(0, 2).map((a) => <li key={a}>{a}</li>)}
             </ul>
           </motion.div>
         )}
-        <motion.div variants={rise} className="section">
+        <motion.div className="section rise">
           <motion.a className="btn wide" href={districtHref(n)} whileHover={{ y: -1 }} whileTap={{ scale: 0.97 }}>
             {t("open_report")} <span aria-hidden="true">→</span>
           </motion.a>
@@ -151,9 +145,9 @@ function PastDistrict({ selected: n, past, lag, monthKey, onClose }) {
   return (
     <>
       <Header name={n} sub={t("past_sub", { month: fmt(monthKey), ahead: t(lag === "1" ? "one_month" : "two_months") })} onClose={onClose} />
-      <motion.div variants={stagger} initial="hidden" animate="show">
-        <motion.div variants={rise} className="section"><Status level={x.level} text={verdict} /></motion.div>
-        <motion.div variants={rise} className="section">
+      <motion.div className="stagger">
+        <motion.div className="section rise"><Status level={x.level} text={verdict} /></motion.div>
+        <motion.div className="section rise">
           <h3>{t("what_happened")}</h3>
           <div className="kpis">
             <Kpi icon="cases" label={t("cases_in", { month: mon(monthKey) })} value={x.actual ?? "—"}

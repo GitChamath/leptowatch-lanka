@@ -51,6 +51,7 @@ const TEXT = {
       ["{b} of 100", "4-week periods have more cases than usual anyway, with no forecast at all."],
     ],
     tested: "We set the rules using 2011 to 2017 only, then tested them on {from} to {to}, treating each Saturday as if it were today.",
+    example: {"title": "A real example: Jaffna, 2024", "text": "In December 2024 a leptospirosis outbreak in Jaffna caused several deaths after heavy rain and floods. We replayed LeptoWatch using only the data that existed on each date:", "rows": [["2 Nov", "Warning: 39 rainy days in 8 weeks (usual 33), 5 cases in 4 weeks (usual 1)"], ["2 – 30 Nov", "Warning every week"], ["Mid-December", "Outbreak recognised; deaths reported from 11 December"], ["4 weeks to 28 Dec", "218 cases, against about 5 in a usual year"]], "note": "So the Warning came about six weeks before cases peaked. This is a replay of past data, not a forecast anyone saw at the time, and it assumes the officer entered the case counts."},
     mind: "Keep in mind",
     minds: [
       "Public case reports come 8 to 11 weeks late. Add the cases notified in the last 4 weeks, so a Warning is possible.",
@@ -109,6 +110,7 @@ const TEXT = {
       ["100 න් {b}", "පුරෝකථනයක් නැතිව වුවද සති 4 කාලපරිච්ඡේදවල සුපුරුදු ප්‍රමාණයට වඩා රෝගීන් සිටියි."],
     ],
     tested: "අපි නීති සකස් කළේ 2011 සිට 2017 දක්වා දත්ත පමණක් භාවිතයෙන්. පසුව සෑම සෙනසුරාදාවක්ම අද දිනය ලෙස සලකා ඒවා {from} සිට {to} දක්වා පරීක්ෂා කළෙමු.",
+    example: {"title": "සැබෑ උදාහරණයක්: යාපනය, 2024", "text": "2024 දෙසැම්බරයේ අධික වැසි සහ ගංවතුරෙන් පසු යාපනයේ ඇති වූ මී උණ පැතිරීමෙන් කිහිප දෙනෙක් මිය ගියහ. එක් එක් දිනයේ තිබූ දත්ත පමණක් භාවිතා කර අපි LeptoWatch නැවත ධාවනය කළෙමු:", "rows": [["නොවැ. 2", "අනතුරු ඇඟවීම: සති 8 තුළ වැසි දින 39 (සුපුරුදු 33), සති 4 තුළ රෝගීන් 5 (සුපුරුදු 1)"], ["නොවැ. 2 – 30", "සෑම සතියකම අනතුරු ඇඟවීම"], ["දෙසැම්බර් මැද", "පැතිරීම හඳුනා ගැනිණි; දෙසැ. 11 සිට මරණ වාර්තා විය"], ["දෙසැ. 28 දක්වා සති 4", "රෝගීන් 218, සුපුරුදු වසරක 5 ක් පමණ"]], "note": "එනම් රෝගීන් උපරිමයට පැමිණීමට සති හයකට පමණ පෙර අනතුරු ඇඟවීම ලැබුණි. මෙය අතීත දත්ත නැවත ධාවනය කිරීමකි, එකල කිසිවෙකු දුටු පුරෝකථනයක් නොවේ; නිලධාරියා රෝගී සංඛ්‍යා ඇතුළත් කළ බව එය උපකල්පනය කරයි."},
     mind: "මතක තබා ගන්න",
     minds: [
       "ප්‍රසිද්ධ රෝගී වාර්තා සති 8 සිට 11 දක්වා ප්‍රමාද වේ. අනතුරු ඇඟවීමක් ලැබිය හැකි වන පරිදි පසුගිය සති 4 තුළ දැනුම් දුන් රෝගීන් ඇතුළත් කරන්න.",
@@ -167,6 +169,7 @@ const TEXT = {
       ["100 இல் {b}", "முன்னறிவிப்பு இல்லாமலும் 4 வாரக் காலங்களில் வழக்கத்தை விட அதிக நோயாளர்கள் இருக்கின்றனர்."],
     ],
     tested: "விதிகளை 2011 முதல் 2017 வரையான தரவை மட்டும் கொண்டு அமைத்தோம். பின்னர் ஒவ்வொரு சனிக்கிழமையையும் இன்று போலக் கருதி {from} முதல் {to} வரை சோதித்தோம்.",
+    example: {"title": "ஓர் உண்மை உதாரணம்: யாழ்ப்பாணம், 2024", "text": "2024 டிசம்பரில் கனமழை மற்றும் வெள்ளத்தின் பின் யாழ்ப்பாணத்தில் ஏற்பட்ட எலிக்காய்ச்சல் பரவலால் பலர் உயிரிழந்தனர். ஒவ்வொரு திகதியிலும் இருந்த தரவை மட்டும் கொண்டு LeptoWatch ஐ மீண்டும் இயக்கினோம்:", "rows": [["நவ. 2", "எச்சரிக்கை: 8 வாரங்களில் 39 மழை நாட்கள் (வழக்கம் 33), 4 வாரங்களில் 5 நோயாளர்கள் (வழக்கம் 1)"], ["நவ. 2 – 30", "ஒவ்வொரு வாரமும் எச்சரிக்கை"], ["டிசம்பர் நடுப்பகுதி", "பரவல் அடையாளம் காணப்பட்டது; டிச. 11 முதல் மரணங்கள் அறிவிக்கப்பட்டன"], ["டிச. 28 வரை 4 வாரங்கள்", "218 நோயாளர்கள், வழக்கமான ஆண்டில் சுமார் 5"]], "note": "அதாவது நோயாளர்கள் உச்சத்தை அடைவதற்குச் சுமார் ஆறு வாரங்களுக்கு முன்பே எச்சரிக்கை வந்தது. இது கடந்த தரவின் மீள் இயக்கம், அப்போது யாரும் பார்த்த முன்னறிவிப்பு அல்ல; அதிகாரி நோயாளர் எண்ணிக்கைகளை உள்ளிட்டதாக இது கருதுகிறது."},
     mind: "நினைவில் கொள்ளுங்கள்",
     minds: [
       "பொது நோயாளர் அறிக்கைகள் 8 முதல் 11 வாரங்கள் தாமதமாக வருகின்றன. எச்சரிக்கை சாத்தியமாக, கடந்த 4 வாரங்களில் அறிவிக்கப்பட்ட நோயாளர்களைச் சேருங்கள்.",
@@ -256,6 +259,15 @@ export default function AboutPage({ summary, weekly }) {
           ))}
         </div>
         <p className="note">{fill(T.tested, v)}</p>
+      </section>
+
+      <section className="about-section">
+        <h2>{T.example.title}</h2>
+        <p className="about-leads">{T.example.text}</p>
+        <dl className="about-sources about-case">
+          {T.example.rows.map(([k, text]) => <div key={k}><dt>{k}</dt><dd>{text}</dd></div>)}
+        </dl>
+        <p className="note">{T.example.note}</p>
       </section>
 
       <section className="about-section">

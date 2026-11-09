@@ -1,6 +1,5 @@
 import { MONTH_NAMES, byLang, getLang, t } from "./i18n.js";
 
-export const MONTHS = MONTH_NAMES.en;
 const monthName = (m) => (MONTH_NAMES[getLang()] || MONTH_NAMES.en)[+m.slice(5) - 1];
 export const fmt = (m) => (m ? `${monthName(m)} ${m.slice(0, 4)}` : "—");
 export const mon = (m) => (m ? monthName(m) : "—");
@@ -28,7 +27,7 @@ export const LEVEL_MEANING = byLang({
   ta: { warning: "முன்னுரிமைப் பின்தொடர்தல் தேவை", watch: "நிலைமையை உன்னிப்பாகக் கண்காணியுங்கள்", normal: "வரம்புக்கு மேல் சமிக்ஞை இல்லை", nodata: "மதிப்பிடப் போதுமான தரவு இல்லை" },
 });
 export const LEVELS = ["warning", "watch", "normal"];
-export const COLOR_VAR = { warning: "--warning", watch: "--watch", watch_rain: "--watch-rain", normal: "--normal", nodata: "--nodata" };
+const COLOR_VAR = { warning: "--warning", watch: "--watch", watch_rain: "--watch-rain", normal: "--normal", nodata: "--nodata" };
 
 /** A Watch that rests on rain alone: rain is up and no rise in cases is known. Shown paler on the map. */
 export const rainOnly = (c) => !!c && c.level === "watch" && !!c.rain_signal && c.case_signal !== true;
@@ -112,7 +111,7 @@ export const PROVINCE = {
   Ratnapura: "Sabaragamuwa", Kegalle: "Sabaragamuwa",
 };
 
-export const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 export const levelColor = (lv) => cssVar(COLOR_VAR[lv] || "--nodata");
 
 /* ---------- map geometry ---------- */

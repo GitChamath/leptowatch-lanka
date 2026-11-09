@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Chart, Delta, Kpi, Loading, Rich, Segmented, Status, rise, stagger } from "../components/bits.jsx";
+import { Chart, Delta, Kpi, Loading, Rich, Segmented, Status } from "../components/bits.jsx";
 import { CountEntry, Check, Messages, TrackRecord } from "../components/district.jsx";
 import { dname, province, t } from "../i18n.js";
 import WeeklyCard from "../components/weekly.jsx";
@@ -102,8 +102,8 @@ function Report({ n, d, lag, onSaveCount, caseMonth, ml }) {
   const hist = lag1.slice(Math.max(0, lastReported - 35), lastReported + 1);
 
   return (
-    <motion.div key={lag} className="report" variants={stagger} initial="hidden" animate="show">
-      <motion.section variants={rise} className={`card span-2 hero ${lv}`}>
+    <motion.div key={lag} className="report stagger">
+      <motion.section className={`card span-2 hero ${lv} rise`}>
         <Status level={lv} text={whyText(c)} meaning={LEVEL_MEANING[lv]} />
         <RiskLine c={c} ml={ml} />
         {c.low_confidence && (
@@ -116,7 +116,7 @@ function Report({ n, d, lag, onSaveCount, caseMonth, ml }) {
         </p>
       </motion.section>
 
-      <motion.section variants={rise} className="card">
+      <motion.section className="card rise">
         <h3>{t("what_to_do")}</h3>
         {ACTIONS[lv].length > 0 ? (
           <ul className="checklist">
@@ -125,18 +125,18 @@ function Report({ n, d, lag, onSaveCount, caseMonth, ml }) {
         ) : <p className="note">{t("nothing_extra")}</p>}
       </motion.section>
 
-      <motion.section variants={rise} className="card">
+      <motion.section className="card rise">
         <CountEntry month={c.data_month} known={known} current={c.cases_data_month} toWarning={casesForWarning(c)}
           onSave={(v) => onSaveCount(n, c.data_month, v)} />
       </motion.section>
 
       {(lv === "warning" || lv === "watch") && (
-        <motion.section variants={rise} className="card span-2">
+        <motion.section className="card span-2 rise">
           <Messages district={n} c={c} />
         </motion.section>
       )}
 
-      <motion.section variants={rise} className="card">
+      <motion.section className="card rise">
         <h3>{t("why_says", { level: LEVEL[lv] })}</h3>
         <div className="kpis">
           <Kpi icon="rain" label={t("rainy_days_in", { month: mon(c.data_month) })} value={c.rainy_days}
@@ -161,12 +161,12 @@ function Report({ n, d, lag, onSaveCount, caseMonth, ml }) {
         )}
       </motion.section>
 
-      <motion.section variants={rise} className="card">
+      <motion.section className="card rise">
         <h3>{t("cases_chart", { month: fmt(hist.at(-1)?.target) })}</h3>
         <Chart rows={hist} />
       </motion.section>
 
-      <motion.section variants={rise} className="card">
+      <motion.section className="card rise">
         <h3>{t("past_record_short", { level: LEVEL[lv] })}</h3>
         <TrackRecord rec={d.records?.[lag]} level={lv} base={d.track?.[lag]?.base_rate} />
       </motion.section>

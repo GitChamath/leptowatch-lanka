@@ -62,7 +62,7 @@ export default function App() {
 
   return (
     <>
-      <motion.header className="appbar" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.4 }}>
+      <header className="appbar">
         <a className="brand" href="#/" title={t("nav_home")} aria-label={`LeptoWatch Lanka, ${t("nav_home")}`}>
           <motion.div className="logo" animate={{ y: [0, -2, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}><Icon.logo /></motion.div>
           <div>
@@ -77,18 +77,17 @@ export default function App() {
             ))}
           </div>
         </div>
-      </motion.header>
+      </header>
 
-      <AnimatePresence mode="wait">
-        <motion.div key={`${route.page}/${route.param || ""}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
-          {route.page === "district" && route.param ? <DistrictPage name={route.param} {...shared} />
-            : page === "history" ? <HistoryPage {...shared} />
-              : page === "about" ? <AboutPage {...shared} />
-                : page === "map" ? <MapPage {...shared} />
-                  : <HomePage {...shared} />}
-        </motion.div>
-      </AnimatePresence>
+      {/* CSS fade-in, not AnimatePresence mode="wait": that could leave the new page stuck invisible after
+          a reload or Back with framer-motion 11 on React 19. If the animation never runs, the page still shows. */}
+      <div key={`${route.page}/${route.param || ""}`} className="page-in">
+        {route.page === "district" && route.param ? <DistrictPage name={route.param} {...shared} />
+          : page === "history" ? <HistoryPage {...shared} />
+            : page === "about" ? <AboutPage {...shared} />
+              : page === "map" ? <MapPage {...shared} />
+                : <HomePage {...shared} />}
+      </div>
 
       <Footer summary={summary} />
 

@@ -56,7 +56,7 @@ export default function MapView({ geo, levelOf, selected, onSelect, softOf = () 
                 tabIndex={0}
                 role="button"
                 aria-label={`${s.name}: ${LEVEL[lv]}`}
-                initial={{ opacity: 0, y: -8 }}
+                initial={{ y: -8 }}
                 animate={{ opacity: selected && selected !== s.name ? 0.55 : 1, y: 0, fill: levelColor(fillOf(s.name)) }}
                 transition={{
                   opacity: { duration: 0.35, delay: i * 0.025 }, y: { duration: 0.5, delay: i * 0.025, ease: [0.22, 1, 0.36, 1] },

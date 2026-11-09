@@ -7,7 +7,6 @@ DB_PATH = DATA / "leptowatch.sqlite"
 STATE_PATH = DATA / "state.json"
 GEO_PATH = DATA / "districts.geojson"
 SEED = DATA / "seed"
-PDF_CACHE = DATA / "cache" / "wer"
 
 DISTRICTS = [
     "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota",
