@@ -180,6 +180,24 @@ the engine, which skips the few decisions without a full 8 weeks of rain history
 (893 of 1,245) and 66.4% (834 of 1,256); the site shows 72% and 66%. Held-out years had already been seen once for the
 old rule, so this is a second look at them, with the choice made on development years only.
 
+**Two more ideas, not adopted.** Same method each time: explore on 2011–2017, fix the choice in writing, run 2018+ once.
+
+- *Soil moisture* (NASA POWER top-soil and root-zone wetness, 28 or 56 days, instead of, with, or as an alternative
+  to 8-week rain; `research/PREREG_soil.md`, `research/soil_test.py`). No soil rule beat 8-week rain on development
+  years (best 70.9% / 60.9% against 72.1% / 65.4%), so none was run on held-out years.
+- *Neighbouring districts' cases* (`research/PREREG_neighbours.md`, `research/neighbour_test.py`). The chosen rule
+  (own cases above 1.4 × usual, or above usual with neighbours above 2 × usual) scored 71.4% and 66.5% held-out against
+  71.8% and 66.3%. It did not win at both distances, so it was not adopted.
+
+With these sources, rain plus a clear rise in cases looks close to the ceiling.
+
+**Case study: Jaffna, December 2024** (`research/case_jaffna_2024.md`, `research/case_study.py`). A leptospirosis
+outbreak after north-east monsoon rain and Cyclone Fengal killed 5–8 people; deaths were reported from 11 December.
+Replayed on the data available each Saturday, the weekly outlook put Jaffna on Warning from 2 November and every week
+of November, about six weeks before cases peaked (218 in the 4 weeks to 28 December, against about 5 usual). Caveats:
+it is a replay, Jaffna's usual is so low that a handful of cases passed the bar, and it dropped to Watch for one week
+on 7 December.
+
 The earlier zone-level analysis (69% vs a 48% base rate) did not hold up at district level on newer data.
 `research/` contains every test, including the ones that weakened the original claim.
 
