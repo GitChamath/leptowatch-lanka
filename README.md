@@ -1,8 +1,25 @@
 # LeptoWatch Lanka
 
-A district-level leptospirosis early warning for Sri Lanka. Each month it combines rainfall that has
-already fallen with the latest case counts, and tells a district health officer whether the coming
-month is likely to be **worse than a normal season** for that district.
+A district-level leptospirosis early warning for Sri Lanka. Every Saturday it combines rain over the last
+8 weeks with cases over the last 4 weeks, and tells a district health officer whether the next 4 weeks, and
+weeks 5 to 8, are likely to be **worse than a normal season** for that district.
+
+- **Warning**: wetter than usual and cases clearly above usual (over 1.4 × usual). **Watch**: one of the two.
+  **Normal**: neither. **Needs case count**: wetter than usual but no recent case count, so the officer is asked
+  to enter one.
+- On 2018 onwards, held out while the rules were chosen on 2011–2017, a Warning was followed by more cases than
+  usual **72%** of the time for the next 4 weeks and **66%** for weeks 5 to 8 when the officer entered an
+  up-to-date count, and **66%** and **61%** using public reports alone, which go online about 8 weeks late.
+  By chance it would be 54%. Details under [How good it is](#how-good-it-is).
+- The dashboard is in English, Sinhala and Tamil. It also keeps the earlier monthly outlook ("Past seasons").
+
+![Map of Sri Lanka's 25 districts with the weekly outlook; Mannar is selected and shows a Warning](docs/screenshots/map.png)
+
+| District report | Same map in Sinhala |
+|---|---|
+| ![Mannar district report: rain and cases against usual, a box for the officer's own count, and what to do](docs/screenshots/district.png) | ![The map and Mannar card in Sinhala](docs/screenshots/map-sinhala.png) |
+
+*Outlook decided 7 November 2026. Without officer counts it uses the latest public report (4 weeks to 20 September).*
 
 Population-level risk for planning prevention only. It does not diagnose, treat or advise individuals.
 
@@ -282,24 +299,28 @@ during the competition period. We own what is submitted here.
 - **The outcome is a near coin-flip by construction.** "Worse than normal" uses the district's own median-based
   normal, so about half of all months qualify (53% base rate). That is the right target for "is this season
   turning" but it is not an outbreak threshold, and a 71% hit rate should be read against 53%, not against zero.
-- Because public case reports lag, the live outlook is usually rain-only (Watch at most).
-  Officers can enter current counts on the dashboard (or via `POST /api/cases`) to get Warnings in real time.
+- Public case reports go online about 8 weeks late, so without an officer's count the weekly outlook uses a
+  report up to 9 weeks old (with nothing that recent, a wetter-than-usual district shows "Needs case count"), and Warnings are right less often (66% / 61% instead of 72% / 66%).
+  Officers can enter current counts on the dashboard (or via `POST /api/cases`, which has no login yet and
+  listens on 127.0.0.1 only) to get up-to-date outlooks.
 - When recent case history is missing, the live outlook estimates "normal" from the most recent 12 months
   available (within two years) and says so. The back-test never uses this fallback.
 - Leptospirosis is under-reported. Comparing each district with its own normal reduces the effect of
   steady under-reporting, but does not remove it.
 - COVID-19 disrupted reporting in 2020–2022.
-- **Languages.** The map, district card and district report can be switched to Sinhala or Tamil
-  (`frontend/src/i18n.js`); How it works and Past seasons stay in English. Each Watch or Warning report drafts a
+- **Languages.** Home, the map, district card, district report and How it works can be switched to Sinhala or
+  Tamil (`frontend/src/i18n.js`); Past seasons stays in English. Each Watch or Warning report drafts a
   farmer awareness message and a staff SMS in any of the three languages for the officer to check and send; the
   system sends nothing itself. The Sinhala and Tamil text is a draft and needs a native speaker's review.
 
 ## Layout
 
 ```
-lw/          collectors (wer.py, chirps.py), store, monthly series, engine, risk model (ml.py), server
-scripts/     seed, update, build_state, compare_models, export_seed, export_dataset, serve
-frontend/    React dashboard source (map, district panel, past-season replay)
+lw/          collectors (wer.py, chirps.py, openmeteo.py), store, monthly series, engine, weekly outlook
+             (weekly.py), risk model (ml.py), server
+scripts/     seed, update, build_state, build_weekly, backfill_weekly, compare_models, export_seed,
+             export_dataset, serve
+frontend/    React dashboard source (home, map, district report, How it works, past-season replay)
 web/         built dashboard served by lw/server.py
 tests/       parser and engine tests
 research/    analysis scripts behind the numbers above, including denominator_test.py
