@@ -103,7 +103,7 @@ class Engine(unittest.TestCase):
         self.assertTrue(own["officer"])
         self.assertEqual((own["cases_data_month"], own["cases_to"]), (500, w.isoformat()))
         self.assertEqual(own["level"], "watch")                          # cases far above normal, rain usual
-        # the static dashboard applies the rule in the browser with officer_normal: it must give the same answer
+        # officer_normal (shown before a count is entered) must match what the count is then judged against
         for c in (0, 1, 3, 10, 500):
             rec = weekly.live_assess(d, w, 1, {w: c})
             self.assertEqual(weekly.level_of(public["rain_signal"], c, public["officer_normal"]), rec["level"])

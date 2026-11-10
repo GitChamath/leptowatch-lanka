@@ -314,8 +314,8 @@ def live_assess(d, w, lead, officer):
         rec = _live_record(d, w, lead, a, a["cases_data_month"], at=dt.date.fromisoformat(a["cases_to"]), officer=False)
     else:
         rec = _live_record(d, w, lead, a, None, at=w, officer=False)
-    # what an officer's count for the 28 days to w would be judged against, so a static copy of the dashboard
-    # (scripts/export_static.py) can apply the same rule in the browser
+    # what an officer's count for the 28 days to w would be judged against, so the dashboard can say how many
+    # cases would make a Warning before the officer enters a count
     normal, expected, low = _normals(d, w, lead, at=w)
     return rec | {"officer_normal": normal, "officer_expected": round(expected, 1) if expected else None,
                   "officer_low": low, "officer_cases_for_warning": cases_for_warning(normal)}
