@@ -196,7 +196,8 @@ function officerCount(body) {
     d[lead] = { ...r, cases_data_month: c, case_signal: n == null ? null : up, level,
       cases_normal: n == null ? null : Math.round(n * 10) / 10, expected: r.officer_expected,
       cases_for_warning: r.officer_cases_for_warning ?? null, low_confidence: r.officer_low,
-      cases_to: end, officer: true, window_from: plusDays(end, -27) };
+      cases_to: end, officer: true, window_from: plusDays(end, -27),
+      risk: null };              // the risk model runs on the server; a stale percentage is not shown beside a new count
   }
   return { saved: 1 };
 }
